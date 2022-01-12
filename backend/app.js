@@ -1,10 +1,10 @@
-// const connectDB = require('./db/connect');
+const connectDB = require('./db/connect');
 require('dotenv').config()
 
 const express = require('express');
 const app = express();
-// const tasks = require('./routes/tasks');
-
+const authRoute = require('./routes/auth');
+const productsRoute = require('./routes/products');
 
 // middleware
 
@@ -12,19 +12,16 @@ const app = express();
 app.use(express.json())
 
 // routes
-app.get('/', (req, res) => {
-  res.send('e-commerce api')
-})
-
-// app.use('/api/v1/tasks', tasks)
+app.use('/api/v1/auth', authRoute)
+app.use('/api/v1/products', productsRoute)
 
 
-const port = 5000;
+const port = process.env.PORT || 5000;
 
 
 const start = async () => {
   try {
-    // await connectDB(process.env.MONGO_URI)
+    await connectDB(process.env.MONGO_URI)
     app.listen(port, console.log(`Server listening on port ${port}...`))
   } catch (error) {
     console.log('ERROR:...', error)
