@@ -4,77 +4,79 @@ const { BadRequestError, NotFoundError } = require('../errors');
 
 
 const getAllProducts = async (req, res) => {
-  // const jobs = await Job.find({ createdBy: req.user.userId }).sort('createdAt')
+  const products = await Product
+    .find({ createdBy: req.user.userId })
+    .sort('createdAt')
 
-  // res.status(StatusCodes.OK).json({ jobs, count: jobs.length })
-  res.send('get all products')
+  res.status(StatusCodes.OK).json({ count: products.length, products })
 }
 
 
 const getProduct = async (req, res) => {
-  res.send('get single product')
 
-  // const { user: { userId }, params: { id: jobId } } = req;
-  // const job = await Job.findOne({ _id: jobId, createdBy: userId });
+  const { 
+    user: { userId }, 
+    params: { id: productId } 
+  } = req;
+
+  const product = await Product.findOne({ _id: productId, createdBy: userId });
   
-  // if (!job) {
-  //   throw new NotFoundError(`No job with id ${jobId}`)
-  // }
+  if (!product) {
+    throw new NotFoundError(`No product with id ${productId}`)
+  }
 
-  // res.status(StatusCodes.OK).json({ job })
+  res.status(StatusCodes.OK).json({ product })
 }
 
 
 const createProduct = async (req, res) => {
-  // res.send('create product')
-  res.json(req.body)
+  // the code below links each product to the creator
+  req.body.createdBy = req.user.userId;
 
-  // req.body.createdBy = req.user.userId;
-  // const job = await Job.create(req.body)
-
-  // res.status(StatusCodes.CREATED).json({ job })
+  const product = await Product.create(req.body)
+  res.status(StatusCodes.CREATED).json({ product })
 }
 
 
 const updateProduct = async (req, res) => {
-  res.send('update product')
-  // const {
-  //   body: { company, position },
-  //   user: { userId },
-  //   params: { id: jobId },
-  // } = req;
 
-  // if (company === '' || position === '') {
-  //   throw new BadRequestError('Company or Position fields cannot be empty')
-  // }
+  const {
+    body: { name, category, price, description },
+    user: { userId },
+    params: { id: productId },
+  } = req;
 
-  // const job = await Job.findByIdAndUpdate({ _id: jobId, createdBy: userId }, req.body, {
-  //   new: true,
-  //   runValidators: true
-  // });
+  if (name === '' || category === '' || price === '' || description === '') {
+    throw new BadRequestError('product name, category, price, or description fields cannot be empty')
+  }
 
-  // if (!job) {
-  //   throw new NotFoundError(`No job with id ${jobId}`)
-  // }
+  const product = await Product.findByIdAndUpdate({ _id: productId, createdBy: userId }, req.body, {
+    new: true,
+    runValidators: true
+  });
 
-  // res.status(StatusCodes.OK).json({ job })
+  if (!product) {
+    throw new NotFoundError(`No product with id ${productId}`)
+  }
+
+  res.status(StatusCodes.OK).json({ product })
 }
 
 
 const deleteProduct = async (req, res) => {
-  res.send('delete prodcut')
-  // const { 
-  //   user: { userId },
-  //   params: { id: jobId }
-  // } = req;
+
+  const { 
+    user: { userId },
+    params: { id: productId }
+  } = req;
     
-  // const job = await Task.findOneAndDelete({ _id: jobId, createdBy: userId })
+  const product = await Product.findOneAndDelete({ _id: productId, createdBy: userId })
 
-  // if (!job) {
-  //   throw new NotFoundError(`No task with id : ${jobId}`)
-  // }
+  if (!product) {
+    throw new NotFoundError(`No product with id : ${productId}`)
+  }
 
-  // res.status(StatusCodes.OK).json({ job })
+  res.status(StatusCodes.OK).json({ product })
 }
 
 

@@ -8,11 +8,12 @@ const ProductSchema = new mongoose.Schema({
   },
   category: {
     type: String,
+    enum: ['dress', 'foot wears', 'ornaments', 'underwears', 'home wears', 'sanitaries'],
     required: [true, 'Please provide product category'],
-    maxlength: 20
   },
   price: {
     type: Number,
+    min: 0,
     required: [true, 'Please provide product price'],
   },
   description: {
