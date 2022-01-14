@@ -1,6 +1,6 @@
-// const Job = require("../models/Job");
-// const { StatusCodes } = require('http-status-codes');
-// const { BadRequestError, NotFoundError } = require('../errors');
+const Product = require("../models/Products");
+const { StatusCodes } = require('http-status-codes');
+const { BadRequestError, NotFoundError } = require('../errors');
 
 
 const getAllProducts = async (req, res) => {
@@ -26,7 +26,8 @@ const getProduct = async (req, res) => {
 
 
 const createProduct = async (req, res) => {
-  res.send('create product')
+  // res.send('create product')
+  res.json(req.body)
 
   // req.body.createdBy = req.user.userId;
   // const job = await Job.create(req.body)
