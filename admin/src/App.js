@@ -1,8 +1,9 @@
-import logo from './logo.svg';
-import './App.css';
-import NavBar from './components/NavBar';
+import logo from "./logo.svg";
+import "./App.css";
+import NavBar from "./components/NavBar";
 
 function App() {
+  console.log("hjk");
   return (
     <div className="App">
       <header className="App-header">
