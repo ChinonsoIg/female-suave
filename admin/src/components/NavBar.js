@@ -2,8 +2,8 @@ import React from "react";
 
 const NavBar = () => {
   return (
-    <nav className="navbar navbar-expand-lg bg-light">
-      <div className="container-fluid">
+    <nav className="navbar navbar-expand-lg bg-light sticky-top">
+      <div className="container">
         <a className="navbar-brand" href="/link">
           Navbar
         </a>
@@ -21,62 +21,37 @@ const NavBar = () => {
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
           <ul className="navbar-nav me-auto mb-2 mb-lg-0">
             <li className="nav-item">
-              <a className="nav-link active" aria-current="page" href="/link">
+              <a className="nav-link active colour_me" aria-current="page" href="/link">
                 Home
               </a>
             </li>
-            <li className="nav-item">
-              <a className="nav-link" href="/link">
+            <li className="nav-item me-5">
+              <a className="nav-link colour_me" href="/link">
                 Link
               </a>
             </li>
-            <li className="nav-item dropdown">
-              <a
-                className="nav-link dropdown-toggle"
-                href="/link"
-                id="navbarDropdown"
-                role="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                Dropdown
-              </a>
-              <ul className="dropdown-menu" aria-labelledby="navbarDropdown">
-                <li>
-                  <a className="dropdown-item" href="/link">
-                    Action
-                  </a>
-                </li>
-                <li>
-                  <a className="dropdown-item" href="/link">
-                    Another action
-                  </a>
-                </li>
-                <li>
-                  <hr className="dropdown-divider" />
-                </li>
-                <li>
-                  <a className="dropdown-item" href="/link">
-                    Something else here
-                  </a>
-                </li>
-              </ul>
+            <li>
+              <form className="d-flex colour_me" role="search">
+                <input
+                  className="form-control me-2 w-200 colour_me"
+                  type="search"
+                  placeholder="Search"
+                  aria-label="Search"
+                />
+                <button className="btn btn-outline-success colour_me" type="submit">
+                  Search
+                </button>
+              </form>
             </li>
-            {/* <li className="nav-item">
-              <a className="nav-link disabled">Disabled</a>
-            </li> */}
           </ul>
-          <form className="d-flex" role="search">
-            <input
-              className="form-control me-2"
-              type="search"
-              placeholder="Search"
-              aria-label="Search"
-            />
-            <button className="btn btn-outline-success" type="submit">
-              Search
+          <div className="d-flex">
+            <button className="btn btn-outline-success me-2" type="button">
+              Log In
             </button>
-          </form>
+            <button className="btn btn-success" type="button">
+              Sign Up
+            </button>
+          </div>
         </div>
       </div>
     </nav>
