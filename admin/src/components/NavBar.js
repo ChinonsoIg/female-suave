@@ -1,6 +1,6 @@
 import React from "react";
 
-const NavBar = () => {
+function NavBar() {
   return (
     <nav className="navbar navbar-expand-lg bg-light sticky-top">
       <div className="container">
@@ -21,7 +21,12 @@ const NavBar = () => {
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
           <ul className="navbar-nav me-auto mb-2 mb-lg-0">
             <li className="nav-item">
-              <a className="nav-link active colour_me" aria-current="page" href="/link">
+              <a
+                className="nav-link
+                active colour_me"
+                aria-current="page"
+                href="/link"
+              >
                 Home
               </a>
             </li>
@@ -38,7 +43,10 @@ const NavBar = () => {
                   placeholder="Search"
                   aria-label="Search"
                 />
-                <button className="btn btn-outline-success colour_me" type="submit">
+                <button
+                  className="btn btn-outline-success colour_me"
+                  type="submit"
+                >
                   Search
                 </button>
               </form>
