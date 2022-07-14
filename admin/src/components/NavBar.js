@@ -1,10 +1,10 @@
 import React from "react";
 
-function NavBar() {
+const NavBar = () => {
   return (
     <nav className="navbar navbar-expand-lg bg-light sticky-top">
       <div className="container">
-        <a className="navbar-brand" href="/link">
+        <a className="navbar-brand scale_text" href="/link">
           Navbar
         </a>
         <button
@@ -18,12 +18,11 @@ function NavBar() {
         >
           <span className="navbar-toggler-icon" />
         </button>
-        <div className="collapse navbar-collapse" id="navbarSupportedContent">
+        <div className="collapse navbar-collapse transition" id="navbarSupportedContent">
           <ul className="navbar-nav me-auto mb-2 mb-lg-0">
             <li className="nav-item">
               <a
-                className="nav-link
-                active colour_me"
+                className="nav-link active scale_text"
                 aria-current="page"
                 href="/link"
               >
@@ -31,32 +30,32 @@ function NavBar() {
               </a>
             </li>
             <li className="nav-item me-5">
-              <a className="nav-link colour_me" href="/link">
+              <a className="nav-link scale_text" href="/link">
                 Link
               </a>
             </li>
-            <li>
-              <form className="d-flex colour_me" role="search">
+            {/* <li>
+              <form className="d-flex" role="search">
                 <input
-                  className="form-control me-2 w-200 colour_me"
+                  className="form-control me-2 w-200"
                   type="search"
                   placeholder="Search"
                   aria-label="Search"
                 />
                 <button
-                  className="btn btn-outline-success colour_me"
+                  className="btn btn-outline-success transition"
                   type="submit"
                 >
                   Search
                 </button>
               </form>
-            </li>
+            </li> */}
           </ul>
           <div className="d-flex">
-            <button className="btn btn-outline-success me-2" type="button">
+            <button className="btn btn-outline-success me-2 transition" type="button">
               Log In
             </button>
-            <button className="btn btn-success" type="button">
+            <button className="btn btn-success transition" type="button">
               Sign Up
             </button>
           </div>

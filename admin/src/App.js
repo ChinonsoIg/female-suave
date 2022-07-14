@@ -1,13 +1,17 @@
 import "./App.css";
+import "./styles/Home.css";
 import NavBar from "./components/NavBar";
+import Products from "./components/Products";
 
-function App() {
-  console.log("hjk");
+const App = () => {
   return (
-    <div className="main_container">
+    <main className="main_container">
       <div className="colour_stripe" />
         <NavBar />
-    </div>
+        <div className='container mt-5'>
+          <Products />
+        </div>
+    </main>
   );
 }
 
