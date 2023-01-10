@@ -1,7 +1,27 @@
 require('dotenv').config()
 require('express-async-errors')
 const express = require('express');
+const cors = require('cors');
+
+// newly added
+// var bodyParser = require('body-parser');
+
+
 const app = express();
+
+
+// newly added
+// parse application/x-www-form-urlencoded
+// app.use(bodyParser.urlencoded({ extended: false }))
+// parse application/json
+// app.use(bodyParser.json())
+
+// Add cors
+app.use(cors({
+  origin: '*'
+}));
+
+
 
 const connectDB = require('./db/connect');
 const authenticateUser = require('./middleware/authentication')

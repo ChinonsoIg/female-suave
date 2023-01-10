@@ -26,10 +26,10 @@ const ProductSchema = new mongoose.Schema({
     enum: ['available', 'out of stock'],
     default: 'available'
   },
-  // img: {
-  //   data: Buffer,
-  //   contentType: String
-  // },
+  image: {
+    type: [String],
+    required: [true, 'Please provide at least one image of the product'],
+  },
   createdBy: {
     type: mongoose.Types.ObjectId,
     ref: 'User',

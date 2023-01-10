@@ -4,6 +4,10 @@ const { BadRequestError, NotFoundError } = require('../errors');
 
 
 const getAllProducts = async (req, res) => {
+  // const plainObj = req.user.toObject();
+  // console.error("req: ", plainObj)
+  // res.json({ "user": req.user })
+
   const products = await Product
     .find({ createdBy: req.user.userId })
     .sort('createdAt')
