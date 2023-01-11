@@ -37,8 +37,8 @@ app.use(express.json())
 
 // routes
 app.use('/api/v1/auth', authRouter)
+app.use('/api/v1/customer/auth', customersRouter)
 app.use('/api/v1/products', authenticateUser, productsRouter)
-app.use('/api/v1/customer/auth', authenticateUser, customersRouter)
 
 
 const port = process.env.PORT || 5000;
