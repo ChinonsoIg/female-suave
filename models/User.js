@@ -7,7 +7,7 @@ const UserSchema = new mongoose.Schema({
   name: {
     type: String,
     required: [true, "Please provide a name"],
-    minLength: 3,
+    minLength: 2,
     maxLength: 50,
   },
   email: {
@@ -35,6 +35,10 @@ const UserSchema = new mongoose.Schema({
     enum: ["admin", "seller"],
     required: [true, "Please enter user role"],
   },
+  avatar: {
+    type: String,
+    required: [true, "Please provide a passport"],
+  },
 });
 
 UserSchema.pre("save", async function (next) {
@@ -52,10 +56,11 @@ UserSchema.methods.createJWT = function () {
   const M = mongoose.model("UserSchema", schema);
   const m = new M({ name: this.name, role: this.role });
   */
+ console.log("this: ", this);
 
 
   return jwt.sign(
-    { userId: this._id, name: this.name },
+    { userId: this._id, name: this.name, role: this.role },
     `${process.env.JWT_SECRET}`,
     { expiresIn: `${process.env.JWT_LIFETIME}` }
   );

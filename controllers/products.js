@@ -1,30 +1,36 @@
-const Product = require("../models/Products");
+const Product = require('../models/Products');
 const { StatusCodes } = require('http-status-codes');
 const { BadRequestError, NotFoundError } = require('../errors');
 
 
 const getAllProducts = async (req, res) => {
-  // const plainObj = req.user.toObject();
-  // console.error("req: ", plainObj)
-  // res.json({ "user": req.user })
+  if (req.user.role === 'admin') {
+    const products = await Product
+      .find()
+      .sort('createdAt')
 
-  const products = await Product
-    .find({ createdBy: req.user.userId })
-    .sort('createdAt')
+    res.status(StatusCodes.OK).json({ count: products.length, products })
+  } else {
+    console.log('i still came here!!!');
 
-  res.status(StatusCodes.OK).json({ count: products.length, products })
+    const products = await Product
+      .find({ createdBy: req.user.userId })
+      .sort('createdAt')
+
+    res.status(StatusCodes.OK).json({ count: products.length, products })
+  }
 }
 
 
 const getProduct = async (req, res) => {
 
-  const { 
-    user: { userId }, 
-    params: { id: productId } 
+  const {
+    user: { userId },
+    params: { id: productId }
   } = req;
 
   const product = await Product.findOne({ _id: productId, createdBy: userId });
-  
+
   if (!product) {
     throw new NotFoundError(`No product with id ${productId}`)
   }
@@ -69,11 +75,11 @@ const updateProduct = async (req, res) => {
 
 const deleteProduct = async (req, res) => {
 
-  const { 
+  const {
     user: { userId },
     params: { id: productId }
   } = req;
-    
+
   const product = await Product.findOneAndDelete({ _id: productId, createdBy: userId })
 
   if (!product) {
