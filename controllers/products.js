@@ -25,17 +25,28 @@ const getAllProducts = async (req, res) => {
 const getProduct = async (req, res) => {
 
   const {
-    user: { userId },
+    user: { userId, role },
     params: { id: productId }
   } = req;
 
-  const product = await Product.findOne({ _id: productId, createdBy: userId });
+  if (role === "admin") {
+    const product = await Product.findOne({ _id: productId });
 
-  if (!product) {
-    throw new NotFoundError(`No product with id ${productId}`)
+    if (!product) {
+      throw new NotFoundError(`No product with id ${productId}`)
+    }
+
+    res.status(StatusCodes.OK).json({ product })
+    
+  } else {
+    const product = await Product.findOne({ _id: productId, createdBy: userId });
+
+    if (!product) {
+      throw new NotFoundError(`No product with id ${productId}`)
+    }
+
+    res.status(StatusCodes.OK).json({ product })
   }
-
-  res.status(StatusCodes.OK).json({ product })
 }
 
 
