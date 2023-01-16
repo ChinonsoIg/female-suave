@@ -39,6 +39,11 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: [true, "Please provide a passport"],
   },
+  status: {
+    type: String,
+    enum: ["pending", "active", "suspended"],
+    required: [true, "Please ascertain user status"],
+  }
 });
 
 UserSchema.pre("save", async function (next) {
