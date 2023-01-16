@@ -32,7 +32,22 @@ const login = async (req, res) => {
     .json({ user: { name: user.name, role: user.role }, token });
 };
 
+const getAllUsers = async (req, res) => {
+  console.log("req.user ", req)
+  if (req.user.role === 'admin') {
+    const users = await User
+      .find()
+      .sort('createdAt')
+
+    res.status(StatusCodes.OK).json({ count: users.length, users })
+  } else {
+    console.log('i still came here!!!');
+    res.status(StatusCodes.UNAUTHORIZED).json({ message: "Unauthorised" })
+  }
+}
+
 module.exports = {
   register,
   login,
+  getAllUsers,
 };

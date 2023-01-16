@@ -48,16 +48,6 @@ UserSchema.pre("save", async function (next) {
 });
 
 UserSchema.methods.createJWT = function () {
-  
-  /*
-  Include user role from here
-  const schema = new mongoose.Schema({ role: String, name: String });
-  schema.set("toObject", { getters: true });
-  const M = mongoose.model("UserSchema", schema);
-  const m = new M({ name: this.name, role: this.role });
-  */
- console.log("this: ", this);
-
 
   return jwt.sign(
     { userId: this._id, name: this.name, role: this.role },

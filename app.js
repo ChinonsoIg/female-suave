@@ -29,6 +29,7 @@ const authenticateUser = require('./middleware/authentication')
 const authRouter = require('./routes/auth');
 const productsRouter = require('./routes/products');
 const customersRouter = require('./routes/customerAuth');
+const usersRouter = require('./routes/users');
 
 // middleware
 
@@ -39,6 +40,7 @@ app.use(express.json())
 app.use('/api/v1/auth', authRouter)
 app.use('/api/v1/customer/auth', customersRouter)
 app.use('/api/v1/products', authenticateUser, productsRouter)
+app.use('/api/v1/users', authenticateUser, usersRouter)
 
 
 const port = process.env.PORT || 5000;
