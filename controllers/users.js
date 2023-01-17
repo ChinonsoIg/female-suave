@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const { StatusCodes } = require('http-status-codes');
 const { BadRequestError, NotFoundError } = require('../errors');
+const bcrypt = require("bcryptjs");
 
 const getAllUsers = async (req, res) => {
   const {
@@ -56,7 +57,7 @@ const getUser = async (req, res) => {
 const updateUser = async (req, res) => {
 
   const {
-    body: { name, email, address, role, avatar },
+    body: { name, email, address, role, avatar, password },
     user: { userId, role: userRole },
     params: { id: userParam },
   } = req;
@@ -66,9 +67,13 @@ const updateUser = async (req, res) => {
   }
 
   // hash password
+  const salt = await bcrypt.genSalt(10);
+  const hashPassword = await bcrypt.hash(password, salt);
+
+  const modifiedBody = { ...req.body, password: hashPassword }
 
   if (userRole === "admin") {
-    const user = await User.findByIdAndUpdate({ _id: userParam }, req.body, {
+    const user = await User.findByIdAndUpdate({ _id: userParam }, modifiedBody, {
       new: true,
       runValidators: true
     });
