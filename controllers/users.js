@@ -57,23 +57,26 @@ const getUser = async (req, res) => {
 const updateUser = async (req, res) => {
 
   const {
-    body: { name, email, address, role, avatar, password },
+    body: { name, email, address, role, avatar },
     user: { userId, role: userRole },
     params: { id: userParam },
   } = req;
 
-  if (name === '' || email === '' || address === '' || role === '', avatar === '') {
+  console.log("req: ", req.body)
+
+  if (name === '' || email === '' || address === '' || role === '' || avatar === '') {
     throw new BadRequestError('name, email, address, password, role or avatar fields cannot be empty')
   }
 
+console.log("res: ", res)
   // hash password
-  const salt = await bcrypt.genSalt(10);
-  const hashPassword = await bcrypt.hash(password, salt);
+  // const salt = await bcrypt.genSalt(10);
+  // const hashPassword = await bcrypt.hash(password, salt);
 
-  const modifiedBody = { ...req.body, password: hashPassword }
+  // const modifiedBody = { ...req.body, password: hashPassword }
 
   if (userRole === "admin") {
-    const user = await User.findByIdAndUpdate({ _id: userParam }, modifiedBody, {
+    const user = await User.findByIdAndUpdate({ _id: userParam }, req.body, {
       new: true,
       runValidators: true
     });
@@ -81,6 +84,7 @@ const updateUser = async (req, res) => {
     if (!user) {
       throw new NotFoundError(`No user with id ${userId}`)
     }
+    user.password = ''
 
     res.status(StatusCodes.OK).json({ user })
     
@@ -96,6 +100,7 @@ const updateUser = async (req, res) => {
     if (!user) {
       throw new NotFoundError(`No user with id ${userId}`)
     }
+    user.password = ''
 
     res.status(StatusCodes.OK).json({ user })
   }
