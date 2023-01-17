@@ -11,8 +11,7 @@ const getAllProducts = async (req, res) => {
 
     res.status(StatusCodes.OK).json({ count: products.length, products })
   } else {
-    console.log('i still came here!!!');
-
+    
     const products = await Product
       .find({ createdBy: req.user.userId })
       .sort('createdAt')
@@ -37,7 +36,7 @@ const getProduct = async (req, res) => {
     }
 
     res.status(StatusCodes.OK).json({ product })
-    
+
   } else {
     const product = await Product.findOne({ _id: productId, createdBy: userId });
 
@@ -91,6 +90,7 @@ const deleteProduct = async (req, res) => {
     params: { id: productId }
   } = req;
 
+  // Note this can delete another product
   const product = await Product.findOneAndDelete({ _id: productId, createdBy: userId })
 
   if (!product) {

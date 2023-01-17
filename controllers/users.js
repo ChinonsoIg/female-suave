@@ -56,14 +56,16 @@ const getUser = async (req, res) => {
 const updateUser = async (req, res) => {
 
   const {
-    body: { name, email, address, password, role, avatar },
+    body: { name, email, address, role, avatar },
     user: { userId, role: userRole },
     params: { id: userParam },
   } = req;
 
-  if (name === '' || email === '' || address === '' || password === '' || role === '', avatar === '') {
+  if (name === '' || email === '' || address === '' || role === '', avatar === '') {
     throw new BadRequestError('name, email, address, password, role or avatar fields cannot be empty')
   }
+
+  // hash password
 
   if (userRole === "admin") {
     const user = await User.findByIdAndUpdate({ _id: userParam }, req.body, {
