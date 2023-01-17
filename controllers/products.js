@@ -62,7 +62,6 @@ const updateProduct = async (req, res) => {
 
   const {
     body: { name, category, price, description },
-    user: { userId },
     params: { id: productId },
   } = req;
 
@@ -70,7 +69,7 @@ const updateProduct = async (req, res) => {
     throw new BadRequestError('product name, category, price, or description fields cannot be empty')
   }
 
-  const product = await Product.findByIdAndUpdate({ _id: productId, createdBy: userId }, req.body, {
+  const product = await Product.findByIdAndUpdate({ _id: productId }, req.body, {
     new: true,
     runValidators: true
   });
@@ -86,18 +85,17 @@ const updateProduct = async (req, res) => {
 const deleteProduct = async (req, res) => {
 
   const {
-    user: { userId },
     params: { id: productId }
   } = req;
 
   // Note this can delete another product
-  const product = await Product.findOneAndDelete({ _id: productId, createdBy: userId })
+  const product = await Product.findOneAndDelete({ _id: productId })
 
   if (!product) {
     throw new NotFoundError(`No product with id : ${productId}`)
   }
 
-  res.status(StatusCodes.OK).json({ product })
+  res.status(StatusCodes.OK).json({ product, messsage: "Deleted successfully" })
 }
 
 

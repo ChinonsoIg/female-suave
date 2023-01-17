@@ -125,7 +125,7 @@ const deleteUser = async (req, res) => {
       throw new NotFoundError(`No user with id ${userId}`)
     }
 
-    res.status(StatusCodes.OK).json({ user })
+    res.status(StatusCodes.OK).json({ user, message: "Deleted succesfully" })
   }
 }
 
