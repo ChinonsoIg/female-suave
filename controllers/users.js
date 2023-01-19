@@ -37,14 +37,13 @@ const getUser = async (req, res) => {
     }
 
     res.status(StatusCodes.OK).json({ user })
-    
+
   } else if (userId !== userParam) {
 
     res.status(StatusCodes.UNAUTHORIZED).json({ status: 401, message: "UNAUTHORIZED" })
-
   } else {
 
-    const user = await User.findOne({ _id: userId, _id: userParam });
+    const user = await User.findOne({ _id: userId });
     if (!user) {
       throw new NotFoundError(`No user with id ${userId}`)
     }
@@ -62,13 +61,13 @@ const updateUser = async (req, res) => {
     params: { id: userParam },
   } = req;
 
-  console.log("req: ", req.body)
+  // console.log("req: ", req.body)
 
   if (name === '' || email === '' || address === '' || role === '' || avatar === '') {
     throw new BadRequestError('name, email, address, password, role or avatar fields cannot be empty')
   }
 
-console.log("res: ", res)
+  console.log("res: ", res)
   // hash password
   // const salt = await bcrypt.genSalt(10);
   // const hashPassword = await bcrypt.hash(password, salt);
@@ -87,13 +86,13 @@ console.log("res: ", res)
     user.password = ''
 
     res.status(StatusCodes.OK).json({ user })
-    
+
   } else if (userId !== userParam) {
     res.status(StatusCodes.UNAUTHORIZED).json({ status: 401, message: "UNAUTHORIZED" })
 
   } else {
 
-    const user = await User.findByIdAndUpdate({ _id: userId, _id: userParam }, req.body, {
+    const user = await User.findByIdAndUpdate({ _id: userId }, req.body, {
       new: true,
       runValidators: true
     });
@@ -123,14 +122,14 @@ const deleteUser = async (req, res) => {
     }
 
     res.status(StatusCodes.OK).json({ user, message: "Success" })
-    
+
   } else if (userId !== userParam) {
 
     res.status(StatusCodes.UNAUTHORIZED).json({ status: 401, message: "UNAUTHORIZED" })
 
   } else {
 
-    const user = await User.findByIdAndDelete({ _id: userId, _id: userParam });
+    const user = await User.findByIdAndDelete({ _id: userId });
     if (!user) {
       throw new NotFoundError(`No user with id ${userId}`)
     }
