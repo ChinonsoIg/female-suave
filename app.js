@@ -10,18 +10,6 @@ const rateLimiter = require('express-rate-limit');
 const express = require('express');
 
 const app = express();
-// newly added
-// parse application/x-www-form-urlencoded
-// app.use(bodyParser.urlencoded({ extended: false }))
-// parse application/json
-// app.use(bodyParser.json())
-
-// Add cors
-// app.use(cors({
-//   origin: '*'
-// }));
-
-
 
 const connectDB = require('./db/connect');
 const authenticateUser = require('./middleware/authentication')
@@ -33,7 +21,7 @@ const usersRouter = require('./routes/users');
 const categoriesRouter = require('./routes/categories');
 
 // middleware
-app.use('trust proxy', 1)
+app.set('trust proxy', 1)
 app.use(rateLimiter({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100
@@ -43,6 +31,9 @@ app.use(helmet())
 app.use(cors())
 app.use(xss())
 
+app.get('/', (req, res) => {
+  res.send('Jobs API')
+})
 // routes
 app.use('/api/v1/auth', authRouter)
 app.use('/api/v1/customer/auth', customersRouter)
