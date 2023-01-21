@@ -13,7 +13,7 @@ const auth = async (req, res, next) => {
 
   try {
     const payload = jwt.verify(token, `${process.env.JWT_SECRET}`)
-    req.user = { userId: payload.userId, firstName: payload.firstName, firstName: payload.firstName, lastName: payload.lastName, role: payload.role }
+    req.user = { userId: payload.userId, firstName: payload.firstName, lastName: payload.lastName, role: payload.role }
 
     // remember to call next, else you won't get to job route
     next()
