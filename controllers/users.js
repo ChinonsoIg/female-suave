@@ -12,6 +12,7 @@ const getAllUsers = async (req, res) => {
     const users = await User
       .find()
       .sort('createdAt')
+      .select('-password');
 
     res.status(StatusCodes.OK).json({ count: users.length, users })
 
@@ -30,7 +31,7 @@ const getUser = async (req, res) => {
   } = req
 
   if (userRole === "admin") {
-    const user = await User.findOne({ _id: userParam });
+    const user = await User.findOne({ _id: userParam }).select('-password');
 
     if (!user) {
       throw new NotFoundError(`No user with id ${userId}`)
@@ -43,7 +44,7 @@ const getUser = async (req, res) => {
     res.status(StatusCodes.UNAUTHORIZED).json({ status: 401, message: "UNAUTHORIZED" })
   } else {
 
-    const user = await User.findOne({ _id: userId });
+    const user = await User.findOne({ _id: userId }).select('-password');
     if (!user) {
       throw new NotFoundError(`No user with id ${userId}`)
     }
@@ -56,18 +57,24 @@ const getUser = async (req, res) => {
 const updateUser = async (req, res) => {
 
   const {
-    body: { name, email, address, role, avatar },
+    body: { firstName, lastName, email, address, avatar },
     user: { userId, role: userRole },
     params: { id: userParam },
   } = req;
 
-  // console.log("req: ", req.body)
-
-  if (name === '' || email === '' || address === '' || role === '' || avatar === '') {
-    throw new BadRequestError('name, email, address, password, role or avatar fields cannot be empty')
+  if (firstName === '', lastName === '' || email === '' || address === '' || avatar === '') {
+    throw new BadRequestError('firstName, lastName, email, address, or avatar fields cannot be empty')
   }
 
-  console.log("res: ", res)
+  const modifiableData = {
+    firstName,
+    lastName,
+    email,
+    address,
+    avatar
+  }
+
+  // console.log("res: ", res)
   // hash password
   // const salt = await bcrypt.genSalt(10);
   // const hashPassword = await bcrypt.hash(password, salt);
@@ -75,15 +82,14 @@ const updateUser = async (req, res) => {
   // const modifiedBody = { ...req.body, password: hashPassword }
 
   if (userRole === "admin") {
-    const user = await User.findByIdAndUpdate({ _id: userParam }, req.body, {
+    const user = await User.findByIdAndUpdate({ _id: userParam }, modifiableData, {
       new: true,
       runValidators: true
-    });
+    }).select('-password');
 
     if (!user) {
       throw new NotFoundError(`No user with id ${userId}`)
     }
-    user.password = ''
 
     res.status(StatusCodes.OK).json({ user })
 
@@ -92,14 +98,13 @@ const updateUser = async (req, res) => {
 
   } else {
 
-    const user = await User.findByIdAndUpdate({ _id: userId }, req.body, {
+    const user = await User.findByIdAndUpdate({ _id: userId }, modifiableData, {
       new: true,
       runValidators: true
-    });
+    }).select('-password');
     if (!user) {
       throw new NotFoundError(`No user with id ${userId}`)
     }
-    user.password = ''
 
     res.status(StatusCodes.OK).json({ user })
   }
@@ -115,7 +120,7 @@ const deleteUser = async (req, res) => {
   } = req;
 
   if (userRole === "admin") {
-    const user = await User.findByIdAndDelete({ _id: userParam });
+    const user = await User.findByIdAndDelete({ _id: userParam }).select('-password');
 
     if (!user) {
       throw new NotFoundError(`No user with id ${userId}`)
@@ -129,7 +134,7 @@ const deleteUser = async (req, res) => {
 
   } else {
 
-    const user = await User.findByIdAndDelete({ _id: userId });
+    const user = await User.findByIdAndDelete({ _id: userId }).select('-password');
     if (!user) {
       throw new NotFoundError(`No user with id ${userId}`)
     }
