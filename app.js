@@ -13,6 +13,7 @@ const app = express();
 
 const connectDB = require('./db/connect');
 const authenticateUser = require('./middleware/authentication')
+const authenticateAdmin = require('./middleware/adminAuthentication');
 
 const authRouter = require('./routes/auth');
 const productsRouter = require('./routes/products');
@@ -31,9 +32,9 @@ app.use(helmet())
 app.use(cors())
 app.use(xss())
 
-app.get('/', (req, res) => {
-  res.send('Jobs API')
-})
+// app.get('/', (req, res) => {
+//   res.send('Jobs API')
+// })
 // routes
 app.use('/api/v1/auth', authRouter)
 app.use('/api/v1/customer/auth', customersRouter)

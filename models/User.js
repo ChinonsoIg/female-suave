@@ -4,11 +4,17 @@ const jwt = require("jsonwebtoken");
 
 // Add a valid id
 const UserSchema = new mongoose.Schema({
-  name: {
+  firstName: {
     type: String,
-    required: [true, "Please provide a name"],
+    required: [true, "Please provide your firstname"],
     minLength: 2,
-    maxLength: 50,
+    maxLength: 30,
+  },
+  lastName: {
+    type: String,
+    required: [true, "Please provide your lastname"],
+    minLength: 2,
+    maxLength: 30,
   },
   email: {
     type: String,
@@ -55,7 +61,7 @@ UserSchema.pre("save", async function (next) {
 UserSchema.methods.createJWT = function () {
 
   return jwt.sign(
-    { userId: this._id, name: this.name, role: this.role },
+    { userId: this._id, firstName: this.firstName, lastName: this.lastName, role: this.role },
     `${process.env.JWT_SECRET}`,
     { expiresIn: `${process.env.JWT_LIFETIME}` }
   );
