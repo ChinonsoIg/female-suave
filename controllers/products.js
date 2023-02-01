@@ -45,7 +45,7 @@ const getAllProducts = async (req, res) => {
       ]
     });
     const products = Product
-      .find({ 
+      .find({
         createdBy: req.user.userId,
         $or: [
           { name: { $in: searchString } }, { description: { $in: searchString } }
@@ -103,19 +103,29 @@ const createProduct = async (req, res) => {
 const updateProduct = async (req, res) => {
 
   const {
-    body: { name, category, price, description },
+    body: { name, categoryId, price, quantity, description },
     user: { userId },
     params: { id: productId },
   } = req;
 
-  if (name === '' || category === '' || price === '' || description === '') {
+  if (name === '' || categoryId === '' || price === '', quantity === '' || description === '') {
     throw new BadRequestError('product name, category, price, or description fields cannot be empty')
   }
 
-  const product = await Product.findByIdAndUpdate({ _id: productId, createdBy: userId }, req.body, {
-    new: true,
-    runValidators: true
-  });
+  const product = await Product.findByIdAndUpdate({ 
+    _id: productId, createdBy: userId }, 
+    { 
+      $inc: { quantity: req.body.quantity }, 
+      name: req.body.name,
+      categoryId: req.body.categoryId,
+      price: req.body.price,
+      description: req.body.description,
+    }, 
+    {
+      new: true,
+      runValidators: true
+    }
+  );
 
   if (!product) {
     throw new NotFoundError(`No product with id ${productId}`);
