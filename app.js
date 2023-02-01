@@ -32,15 +32,15 @@ app.use(helmet())
 app.use(cors())
 app.use(xss())
 
-// app.get('/', (req, res) => {
-//   res.send('Jobs API')
-// })
+app.get('/', (req, res) => {
+  res.send('E-commerce  API')
+})
 // routes
 app.use('/api/v1/auth', authRouter)
 app.use('/api/v1/customer/auth', customersRouter)
 app.use('/api/v1/products', authenticateUser, productsRouter)
 app.use('/api/v1/users', authenticateUser, usersRouter)
-app.use('/api/v1/categories', authenticateUser, categoriesRouter)
+app.use('/api/v1/categories', [authenticateUser, authenticateAdmin], categoriesRouter)
 
 
 const port = process.env.PORT || 5000;
