@@ -103,13 +103,13 @@ const createProduct = async (req, res) => {
 const updateProduct = async (req, res) => {
 
   const {
-    body: { name, categoryId, price, quantity, description },
+    body: { name, categoryId, price, quantity, description, status },
     user: { userId },
     params: { id: productId },
   } = req;
 
-  if (name === '' || categoryId === '' || price === '', quantity === '' || description === '') {
-    throw new BadRequestError('product name, category, price, or description fields cannot be empty')
+  if (name === '' || categoryId === '' || price === '', quantity === '' || description === '', status === '') {
+    throw new BadRequestError('product name, category, price, quantity, or description fields cannot be empty')
   }
 
   const product = await Product.findByIdAndUpdate({ 
@@ -120,6 +120,8 @@ const updateProduct = async (req, res) => {
       categoryId: req.body.categoryId,
       price: req.body.price,
       description: req.body.description,
+      status: req.body.status,
+      image: req.body.image
     }, 
     {
       new: true,
@@ -153,10 +155,94 @@ const deleteProduct = async (req, res) => {
 }
 
 
+
+const getProductsByCategory = async (req, res) => {
+
+  const {
+    user: { userId, role },
+    params: { categoryId }
+  } = req;
+
+  // if (role === "admin") {
+  //   const products = await Product.find({ categoryId });
+
+  //   if (!products) {
+  //     throw new NotFoundError(`No product under category ${categoryId}`)
+  //   }
+
+  //   res.status(StatusCodes.OK).json({ products })
+
+  // } else {
+  //   const products = await Product.find({ categoryId, createdBy: userId });
+
+  //   if (!products) {
+  //     throw new NotFoundError(`No product under category ${categoryId}`)
+  //   }
+
+  //   res.status(StatusCodes.OK).json({ products })
+  // }
+
+  const page = parseInt(req.query.page) || 0;
+  const limit = parseInt(req.query.limit) || 3;
+  const search = req.query.search || '';
+  // let sort = req.query.sort || 'rating';
+  let searchString = search.split(" ").map(s => new RegExp(s));
+
+  if (role === 'admin') {
+    const docCount = Product.find.countDocuments({
+      categoryId,
+      $or: [
+        { name: { $in: searchString } }, { description: { $in: searchString } }
+      ]
+    });
+    const products = Product
+      .find({
+        categoryId,
+        $or: [
+          { name: { $in: searchString } }, { description: { $in: searchString } }
+        ]
+      })
+      .sort('createdAt')
+      .skip(page * limit)
+      .limit(limit)
+
+    const response = await Promise.all([products, docCount]);
+
+    res.status(StatusCodes.OK).json({ perPageCount: response[0].length, totalCount: response[1], products: response[0] })
+  } else {
+
+    const docCount = Product.countDocuments({
+      createdBy: userId,
+      categoryId,
+      $or: [
+        { name: { $in: searchString } }, { description: { $in: searchString } }
+      ]
+    });
+    const products = Product
+      .find({
+        createdBy: req.user.userId,
+        categoryId,
+        $or: [
+          { name: { $in: searchString } }, { description: { $in: searchString } }
+        ]
+      })
+      .sort('createdAt')
+      .skip(page * limit)
+      .limit(limit)
+
+    const response = await Promise.all([products, docCount]);
+
+    res.status(StatusCodes.OK).json({ perPageCount: response[0].length, totalCount: response[1], products: response[0] })
+
+  }
+}
+
+
 module.exports = {
   getAllProducts,
   getProduct,
   createProduct,
   updateProduct,
-  deleteProduct
+  deleteProduct,
+  getProductsByCategory
 }
