@@ -5,13 +5,18 @@ const { BadRequestError, NotFoundError } = require('../errors');
 
 const getAllProducts = async (req, res) => {
 
-  const page = parseInt(req.query.page) || 0;
-  const limit = parseInt(req.query.limit) || 3;
-  const search = req.query.search || '';
-  // let sort = req.query.sort || 'rating'; 
-  let searchString = search.split(" ").map(s => new RegExp(s));
+  const {
+    user: { userId, role },
+    query: { page, limit, search }
+  } = req;
 
-  if (req.user.role === 'admin') {
+  const pageCount = parseInt(page) || 0;
+  const limitNumber = parseInt(limit) || 3;
+  const searchQuery = search || '';
+  // let sort = sort || 'rating'; 
+  let searchString = searchQuery.split(" ").map(s => new RegExp(s));
+
+  if (role === 'admin') {
     const docCount = Product.countDocuments({
       $or: [
         { name: { $in: searchString } }, { description: { $in: searchString } }
@@ -24,40 +29,34 @@ const getAllProducts = async (req, res) => {
         ]
       })
       .sort('createdAt')
-      .skip(page * limit)
-      .limit(limit)
+      .skip(pageCount * limitNumber)
+      .limit(limitNumber)
 
     const response = await Promise.all([products, docCount]);
 
-    res.status(StatusCodes.OK).json({ perPageCount: response[0].length, totalCount: response[1], products: response[0] })
+    res.status(StatusCodes.OK).json({ productsPerPage: response[0].length, totalProducts: response[1], products: response[0] })
   } else {
 
-    const page = parseInt(req.query.page) || 0;
-    const limit = parseInt(req.query.limit) || 3;
-    const search = req.query.search || '';
-    // let sort = req.query.sort || 'rating';
-    let searchString = search.split(" ").map(s => new RegExp(s));
-
     const docCount = Product.countDocuments({
-      createdBy: req.user.userId,
+      createdBy: userId,
       $or: [
         { name: { $in: searchString } }, { description: { $in: searchString } }
       ]
     });
     const products = Product
       .find({
-        createdBy: req.user.userId,
+        createdBy: userId,
         $or: [
           { name: { $in: searchString } }, { description: { $in: searchString } }
         ]
       })
       .sort('createdAt')
-      .skip(page * limit)
-      .limit(limit)
+      .skip(pageCount * limitNumber)
+      .limit(limitNumber)
 
     const response = await Promise.all([products, docCount]);
 
-    res.status(StatusCodes.OK).json({ perPageCount: response[0].length, totalCount: response[1], products: response[0] })
+    res.status(StatusCodes.OK).json({ productsPerPage: response[0].length, totalProducts: response[1], products: response[0] })
 
   }
 }
@@ -160,33 +159,15 @@ const getProductsByCategory = async (req, res) => {
 
   const {
     user: { userId, role },
-    params: { categoryId }
+    params: { categoryId },
+    query: { page, limit, search }
   } = req;
 
-  // if (role === "admin") {
-  //   const products = await Product.find({ categoryId });
-
-  //   if (!products) {
-  //     throw new NotFoundError(`No product under category ${categoryId}`)
-  //   }
-
-  //   res.status(StatusCodes.OK).json({ products })
-
-  // } else {
-  //   const products = await Product.find({ categoryId, createdBy: userId });
-
-  //   if (!products) {
-  //     throw new NotFoundError(`No product under category ${categoryId}`)
-  //   }
-
-  //   res.status(StatusCodes.OK).json({ products })
-  // }
-
-  const page = parseInt(req.query.page) || 0;
-  const limit = parseInt(req.query.limit) || 3;
-  const search = req.query.search || '';
-  // let sort = req.query.sort || 'rating';
-  let searchString = search.split(" ").map(s => new RegExp(s));
+  const pageCount = parseInt(page) || 0;
+  const limitNumber = parseInt(limit) || 3;
+  const searchQuery = search || '';
+  // let sort = sort || 'rating';
+  let searchString = searchQuery.split(" ").map(s => new RegExp(s));
 
   if (role === 'admin') {
     const docCount = Product.find.countDocuments({
@@ -203,12 +184,12 @@ const getProductsByCategory = async (req, res) => {
         ]
       })
       .sort('createdAt')
-      .skip(page * limit)
-      .limit(limit)
+      .skip(pageCount * limitNumber)
+      .limit(limitNumber)
 
     const response = await Promise.all([products, docCount]);
 
-    res.status(StatusCodes.OK).json({ perPageCount: response[0].length, totalCount: response[1], products: response[0] })
+    res.status(StatusCodes.OK).json({ productsPerPage: response[0].length, totalProducts: response[1], products: response[0] })
   } else {
 
     const docCount = Product.countDocuments({
@@ -220,19 +201,19 @@ const getProductsByCategory = async (req, res) => {
     });
     const products = Product
       .find({
-        createdBy: req.user.userId,
+        createdBy: userId,
         categoryId,
         $or: [
           { name: { $in: searchString } }, { description: { $in: searchString } }
         ]
       })
       .sort('createdAt')
-      .skip(page * limit)
-      .limit(limit)
+      .skip(pageCount * limitNumber)
+      .limit(limitNumber)
 
     const response = await Promise.all([products, docCount]);
 
-    res.status(StatusCodes.OK).json({ perPageCount: response[0].length, totalCount: response[1], products: response[0] })
+    res.status(StatusCodes.OK).json({ productsPerPage: response[0].length, totalProducts: response[1], products: response[0] })
 
   }
 }
