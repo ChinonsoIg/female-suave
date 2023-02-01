@@ -32,9 +32,9 @@ app.use(helmet())
 app.use(cors())
 app.use(xss())
 
-// app.get('/', (req, res) => {
-//   res.send('Jobs API')
-// })
+app.get('/', (req, res) => {
+  res.send('E-commerce  API')
+})
 // routes
 app.use('/api/v1/auth', authRouter)
 app.use('/api/v1/customer/auth', customersRouter)

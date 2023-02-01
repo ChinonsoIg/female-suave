@@ -6,7 +6,7 @@ const { BadRequestError, NotFoundError } = require('../errors');
 const getAllProducts = async (req, res) => {
 
   const page = parseInt(req.query.page) || 0;
-  const limit = parseInt(req.query.limit) || 5;
+  const limit = parseInt(req.query.limit) || 3;
   const search = req.query.search || '';
   // let sort = req.query.sort || 'rating'; 
   let searchString = search.split(" ").map(s => new RegExp(s));
@@ -35,7 +35,7 @@ const getAllProducts = async (req, res) => {
     const page = parseInt(req.query.page) || 0;
     const limit = parseInt(req.query.limit) || 3;
     const search = req.query.search || '';
-    // let sort = req.query.sort || 'rating';  
+    // let sort = req.query.sort || 'rating';
     let searchString = search.split(" ").map(s => new RegExp(s));
 
     const docCount = Product.countDocuments({
