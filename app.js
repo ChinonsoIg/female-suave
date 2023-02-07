@@ -12,7 +12,7 @@ const express = require('express');
 const app = express();
 
 const connectDB = require('./db/connect');
-const authenticateUser = require('./middleware/authentication')
+const { auth, authenticateCustomer } = require('./middleware/authentication')
 const authenticateAdmin = require('./middleware/adminAuthentication');
 
 const authRouter = require('./routes/auth');
@@ -20,6 +20,7 @@ const productsRouter = require('./routes/products');
 const customersRouter = require('./routes/customerAuth');
 const usersRouter = require('./routes/users');
 const categoriesRouter = require('./routes/categories');
+const ordersRouter = require('./routes/orders');
 
 // middleware
 app.set('trust proxy', 1)
@@ -38,9 +39,10 @@ app.get('/', (req, res) => {
 // routes
 app.use('/api/v1/auth', authRouter)
 app.use('/api/v1/customer/auth', customersRouter)
-app.use('/api/v1/products', authenticateUser, productsRouter)
-app.use('/api/v1/users', authenticateUser, usersRouter)
-app.use('/api/v1/categories', authenticateUser, categoriesRouter)
+app.use('/api/v1/products', auth, productsRouter)
+app.use('/api/v1/users', auth, usersRouter)
+app.use('/api/v1/categories', auth, categoriesRouter)
+app.use('/api/v1/orders', authenticateCustomer, ordersRouter)
 
 
 const port = process.env.PORT || 5000;

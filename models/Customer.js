@@ -39,17 +39,8 @@ CustomerSchema.pre("save", async function (next) {
 
 CustomerSchema.methods.createJWT = function () {
   
-  /*
-  Include user role from here
-  const schema = new mongoose.Schema({ role: String, name: String });
-  schema.set("toObject", { getters: true });
-  const M = mongoose.model("UserSchema", schema);
-  const m = new M({ name: this.name, role: this.role });
-  */
-
-
   return jwt.sign(
-    { userId: this._id, name: this.name },
+    { customerId: this._id, name: this.name },
     `${process.env.JWT_SECRET}`,
     { expiresIn: `${process.env.JWT_LIFETIME}` }
   );

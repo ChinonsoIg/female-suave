@@ -11,8 +11,8 @@ const getAllProducts = async (req, res) => {
   } = req;
 
   let parsePage = parseInt(page) || 0;
-  const pageCount = parsePage-1;
-  const limitNumber = parseInt(limit) || 3;
+  const pageCount = parsePage === 0 ? 0 : parsePage-1;
+  const limitNumber = parseInt(limit) || 10;
   const searchQuery = search || '';
   // let sort = sort || 'rating'; 
   let searchString = searchQuery.split(" ").map(s => new RegExp(s));
@@ -166,10 +166,10 @@ const getProductsByCategory = async (req, res) => {
   } = req;
 
   let parsePage = parseInt(page) || 0;
-  const pageCount = parsePage-1;
-  const limitNumber = parseInt(limit) || 3;
+  const pageCount = parsePage === 0 ? 0 : parsePage-1;
+  const limitNumber = parseInt(limit) || 10;
   const searchQuery = search || '';
-  // let sort = sort || 'rating'; 
+  // let sort = sort || 'rating';
   let searchString = searchQuery.split(" ").map(s => new RegExp(s));
 
   if (role === 'admin') {
