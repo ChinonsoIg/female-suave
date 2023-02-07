@@ -40,7 +40,7 @@ app.use('/api/v1/auth', authRouter)
 app.use('/api/v1/customer/auth', customersRouter)
 app.use('/api/v1/products', authenticateUser, productsRouter)
 app.use('/api/v1/users', authenticateUser, usersRouter)
-app.use('/api/v1/categories', [authenticateUser, authenticateAdmin], categoriesRouter)
+app.use('/api/v1/categories', authenticateUser, categoriesRouter)
 
 
 const port = process.env.PORT || 5000;

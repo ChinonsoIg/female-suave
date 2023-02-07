@@ -10,7 +10,8 @@ const getAllProducts = async (req, res) => {
     query: { page, limit, search }
   } = req;
 
-  const pageCount = parseInt(page) || 0;
+  let parsePage = parseInt(page) || 0;
+  const pageCount = parsePage-1;
   const limitNumber = parseInt(limit) || 3;
   const searchQuery = search || '';
   // let sort = sort || 'rating'; 
@@ -47,7 +48,8 @@ const getAllProducts = async (req, res) => {
       .find({
         createdBy: userId,
         $or: [
-          { name: { $in: searchString } }, { description: { $in: searchString } }
+          { name: { $in: searchString } },
+          { description: { $in: searchString } },
         ]
       })
       .sort('createdAt')
@@ -163,10 +165,11 @@ const getProductsByCategory = async (req, res) => {
     query: { page, limit, search }
   } = req;
 
-  const pageCount = parseInt(page) || 0;
+  let parsePage = parseInt(page) || 0;
+  const pageCount = parsePage-1;
   const limitNumber = parseInt(limit) || 3;
   const searchQuery = search || '';
-  // let sort = sort || 'rating';
+  // let sort = sort || 'rating'; 
   let searchString = searchQuery.split(" ").map(s => new RegExp(s));
 
   if (role === 'admin') {
