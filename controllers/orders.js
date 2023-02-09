@@ -210,7 +210,7 @@ const getCurrentCustomerOrders = async (req, res) => {
     customer: { customerId },
     query: { page, limit, search }
   } = req;
-  console.log("re: ", req.customer)
+  // console.log("re: ", req.customer)
 
   let parsePage = parseInt(page) || 0;
   const pageCount = parsePage === 0 ? 0 : parsePage-1;
@@ -221,9 +221,6 @@ const getCurrentCustomerOrders = async (req, res) => {
 
   const docCount = Order.countDocuments({
     customerId,
-    // $or: [
-    //   { name: { $in: searchString } },
-    // ],
     $or: [
       { 'orderItems': { $elemMatch: { name: { $in: searchString } } } },
     ],
