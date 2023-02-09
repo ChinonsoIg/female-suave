@@ -16,7 +16,6 @@ const createOrder = async (req, res) => {
     customer: { customerId },
     body: { items: cartItems, VAT, shippingFee }
   } = req;
-  // const { items: cartItems, VAT, shippingFee } = req.body;
 
   if (!cartItems || cartItems.length < 1) {
     throw new BadRequestError('No cart items provided');
@@ -207,8 +206,49 @@ const getSingleOrder = async (req, res) => {
 
 
 const getCurrentCustomerOrders = async (req, res) => {
-  const orders = await Order.find({ user: req.user.userId });
-  res.status(StatusCodes.OK).json({ orders, count: orders.length });
+  const {
+    customer: { customerId },
+    query: { page, limit, search }
+  } = req;
+  console.log("re: ", req.customer)
+
+  let parsePage = parseInt(page) || 0;
+  const pageCount = parsePage === 0 ? 0 : parsePage-1;
+  const limitNumber = parseInt(limit) || 10;
+  const searchQuery = search || '';
+  // let sort = sort || 'rating'; 
+  let searchString = searchQuery.split(" ").map(s => new RegExp(s));
+
+  const docCount = Order.countDocuments({
+    customerId,
+    // $or: [
+    //   { name: { $in: searchString } },
+    // ],
+    $or: [
+      { 'orderItems': { $elemMatch: { name: { $in: searchString } } } },
+    ],
+  });
+
+  const orders = Order
+    .find({
+      customerId,
+      $or: [
+        { 'orderItems': { $elemMatch: { name: { $in: searchString } } } },
+      ],
+    })
+    .sort('createdAt')
+    .skip(pageCount * limitNumber)
+    .limit(limitNumber)
+
+  const response = await Promise.all([ orders, docCount ]);
+
+  res
+    .status(StatusCodes.OK)
+    .json({ 
+      ordersPerPage: response[0].length, 
+      totalOrders: response[1], 
+      orders: response[0] 
+    })
 };
 
 
