@@ -4,11 +4,15 @@ const SingleOrderItemSchema = mongoose.Schema({
   name: { type: String, required: true },
   image: { type: String, required: true },
   price: { type: Number, required: true },
-  // amount: { type: Number, required: true },
   quantity: { type: Number, required: true },
   productId: {
-    type: mongoose.Schema.ObjectId,
+    type: mongoose.Types.ObjectId,
     ref: 'Product',
+    required: true,
+  },
+  sellerId: {
+    type: mongoose.Types.ObjectId,
+    ref: 'User',
     required: true,
   },
 });
@@ -18,7 +22,7 @@ const OrderSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  tax: {
+  VAT: {
     type: Number,
     required: true,
   },

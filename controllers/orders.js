@@ -14,16 +14,16 @@ const { BadRequestError, NotFoundError } = require('../errors');
 const createOrder = async (req, res) => {
   const {
     customer: { customerId },
-    body: { items: cartItems, tax, shippingFee }
+    body: { items: cartItems, VAT, shippingFee }
   } = req;
-  // const { items: cartItems, tax, shippingFee } = req.body;
+  // const { items: cartItems, VAT, shippingFee } = req.body;
 
   if (!cartItems || cartItems.length < 1) {
     throw new BadRequestError('No cart items provided');
   }
-  if (!tax || !shippingFee) {
+  if (!VAT || !shippingFee) {
     throw new BadRequestError(
-      'Please provide tax and/or shipping fee'
+      'Please provide VAT and/or shipping fee'
     );
   }
 
@@ -37,21 +37,31 @@ const createOrder = async (req, res) => {
         `No product with id : ${item.productId}`
       );
     }
-    const { name, price, image, _id } = dbProduct;
+    const { name, price, image, createdBy, quantity, _id } = dbProduct;
+
     const singleOrderItem = {
       quantity: item.quantity,
       name,
       price,
       image: image[0],
       productId: _id,
+      sellerId: createdBy,
     };
 
-    const updateQuantity = await Product.findByIdAndUpdate({ _id },
-      { $inc: { quantity: -item.quantity } },
-      { new: true, runValidators: true }
-    );
+    if (item.quantity === quantity) {
+      const updateQuantity = await Product.findByIdAndUpdate({ _id },
+        { $inc: { quantity: -item.quantity }, status: 'out of stock' },
+        { new: true, runValidators: true }
+      );
+      console.log('qty updated with status')
+    } else {
+      const updateQuantity = await Product.findByIdAndUpdate({ _id },
+        { $inc: { quantity: -item.quantity } },
+        { new: true, runValidators: true }
+      );
+      console.log('qty updated')
+    }
 
-    console.log("qty: ", updateQuantity);
 
     // add item to order
     orderItems = [...orderItems, singleOrderItem];
@@ -59,25 +69,31 @@ const createOrder = async (req, res) => {
     // calculate subtotal
     subtotal += item.quantity * price;
   }
+
+  // calculate totalVAT
+  const totalVAT = (VAT / 100) * subtotal
+
   // calculate total
-  const total = tax + shippingFee + subtotal;
+  const total = totalVAT + shippingFee + subtotal;
   // get client secret
   // const paymentIntent = await fakeStripeAPI({
   //   quantity: total,
   //   currency: 'usd',
   // });
 
+  // console.log("d: ", {orderItems, VAT, subtotal, total, shippingFee})
+
 
   const order = await Order.create({
     orderItems,
     total,
     subtotal,
-    tax,
+    VAT,
     shippingFee,
     // clientSecret: paymentIntent.client_secret,
-    customerId: customerId,
+    customerId,
   });
-
+  
   res
     .status(StatusCodes.CREATED)
     .json({
