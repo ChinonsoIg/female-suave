@@ -93,7 +93,7 @@ const createOrder = async (req, res) => {
     // clientSecret: paymentIntent.client_secret,
     customerId,
   });
-  
+
   res
     .status(StatusCodes.CREATED)
     .json({
@@ -105,8 +105,77 @@ const createOrder = async (req, res) => {
 
 
 const getAllOrders = async (req, res) => {
-  const orders = await Order.find({});
-  res.status(StatusCodes.OK).json({ orders, count: orders.length });
+  // const orders = await Order.find({});
+  // res.status(StatusCodes.OK).json({ orders, count: orders.length });
+
+  const {
+    user: { userId, role },
+    query: { page, limit, search }
+  } = req;
+
+  let parsePage = parseInt(page) || 0;
+  const pageCount = parsePage === 0 ? 0 : parsePage-1;
+  const limitNumber = parseInt(limit) || 10;
+  const searchQuery = search || '';
+  // let sort = sort || 'rating'; 
+  let searchString = searchQuery.split(" ").map(s => new RegExp(s));
+
+  if (role === 'admin') {
+    const docCount = Order.countDocuments({
+      $or: [
+        { name: { $in: searchString } },
+      ]
+    });
+    const orders = Order
+      .find({
+        $or: [
+          { name: { $in: searchString } },
+        ]
+      })
+      .sort('createdAt')
+      .skip(pageCount * limitNumber)
+      .limit(limitNumber)
+
+    const response = await Promise.all([orders, docCount]);
+
+    res
+      .status(StatusCodes.OK)
+      .json({ 
+        ordersPerPage: response[0].length, 
+        totalOrders: response[1], 
+        orders: response[0] 
+      })
+  } else {
+
+    const docCount = Order.countDocuments({
+      'orderItems': { $elemMatch: { sellerId: userId }},
+      $or: [
+        { name: { $in: searchString } },
+      ]
+    });
+
+    const orders = Order
+      .find({
+        'orderItems': { $elemMatch: { sellerId: userId }},
+        $or: [
+          { name: { $in: searchString } },
+        ]
+      })
+      .sort('createdAt')
+      .skip(pageCount * limitNumber)
+      .limit(limitNumber)
+
+    const response = await Promise.all([orders, docCount]);
+
+    res
+      .status(StatusCodes.OK)
+      .json({ 
+        ordersPerPage: response[0].length, 
+        totalOrders: response[1], 
+        orders: response[0] 
+      })
+
+  }
 };
 
 

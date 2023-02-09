@@ -42,7 +42,7 @@ app.use('/api/v1/customer/auth', customersRouter)
 app.use('/api/v1/products', auth, productsRouter)
 app.use('/api/v1/users', auth, usersRouter)
 app.use('/api/v1/categories', categoriesRouter) // remove auth from
-app.use('/api/v1/orders', authenticateCustomer, ordersRouter)
+app.use('/api/v1/orders', ordersRouter)
 
 
 const port = process.env.PORT || 5000;
