@@ -3,10 +3,10 @@ const { StatusCodes } = require("http-status-codes");
 const { BadRequestError, UnauthenticatedError } = require("../errors");
 
 const register = async (req, res) => {
-  const user = await Customer.create({ ...req.body });
-  const token = user.createJWT();
+  const customer = await Customer.create({ ...req.body });
+  const token = customer.createJWT();
 
-  res.status(StatusCodes.CREATED).json({ user: { name: user.name }, token });
+  res.status(StatusCodes.CREATED).json({ customer: { name: customer.name }, token });
 };
 
 const login = async (req, res) => {
@@ -16,20 +16,20 @@ const login = async (req, res) => {
     throw new BadRequestError("Please provide email and passwword");
   }
 
-  const user = await Customer.findOne({ email });
-  if (!user) {
+  const customer = await Customer.findOne({ email });
+  if (!customer) {
     throw new UnauthenticatedError("Invalid credentials");
   }
 
-  const isPasswordCorrect = await user.comparePassword(password);
+  const isPasswordCorrect = await customer.comparePassword(password);
   if (!isPasswordCorrect) {
     throw new UnauthenticatedError("Invalid credentials");
   }
 
-  const token = user.createJWT();
+  const token = customer.createJWT();
   res
     .status(StatusCodes.OK)
-    .json({ user: { name: user.name, role: user.role }, token });
+    .json({ customer: { name: customer.name }, token });
 };
 
 module.exports = {
