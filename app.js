@@ -12,8 +12,7 @@ const express = require('express');
 const app = express();
 
 const connectDB = require('./db/connect');
-const { auth, authenticateCustomer } = require('./middleware/authentication')
-const authenticateAdmin = require('./middleware/adminAuthentication');
+const { authUser, authCustomer } = require('./middleware/authentication')
 
 const authRouter = require('./routes/auth');
 const productsRouter = require('./routes/products');
@@ -39,9 +38,9 @@ app.get('/', (req, res) => {
 // routes
 app.use('/api/v1/auth', authRouter)
 app.use('/api/v1/customer/auth', customersRouter)
-app.use('/api/v1/products', auth, productsRouter)
-app.use('/api/v1/users', auth, usersRouter)
-app.use('/api/v1/categories', categoriesRouter) // remove auth from
+app.use('/api/v1/products', authUser, productsRouter)
+app.use('/api/v1/users', authUser, usersRouter)
+app.use('/api/v1/categories', categoriesRouter)
 app.use('/api/v1/orders', ordersRouter)
 
 

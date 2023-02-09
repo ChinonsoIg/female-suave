@@ -1,8 +1,9 @@
 const jwt = require('jsonwebtoken')
 // const User = require('../models/User');
 const { UnauthenticatedError } = require('../errors');
+const { StatusCodes } = require('http-status-codes');
 
-const auth = async (req, res, next) => {
+const authUser = async (req, res, next) => {
   // check header
   const authHeader = req.headers.authorization
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -23,7 +24,7 @@ const auth = async (req, res, next) => {
 }
 
 
-const authenticateCustomer = async (req, res, next) => {
+const authCustomer = async (req, res, next) => {
   // check header
   const authHeader = req.headers.authorization
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -43,22 +44,26 @@ const authenticateCustomer = async (req, res, next) => {
   }
 }
 
-// const adminAuthorization = async (req, res, next) => {
+const adminAuthorization = async (req, res, next) => {
 
-//   try {
-//     const { user: { role } } = req;
-//     if (role === 'admin') {
-//       next()
-//       return;
-//     }
+  try {
+    const { user: { role } } = req;
+    if (role === 'admin' || role === 'seller') {
+      next()
+      return;
+    }
 
-//     res.status(StatusCodes.UNAUTHORIZED).json({ status: 401, message: 'UNAUTHORIZED' })
+    res.status(StatusCodes.UNAUTHORIZED).json({ status: 401, message: 'UNAUTHORIZED' })
 
-//   } catch (error) {
-//     res.status(StatusCodes.UNAUTHORIZED).json({ status: 401, message: 'UNAUTHORIZED' })
-//   }
+  } catch (error) {
+    res.status(StatusCodes.UNAUTHORIZED).json({ status: 401, message: 'UNAUTHORIZED' })
+  }
 
-// }
+}
 
 
-module.exports = { auth, authenticateCustomer };
+module.exports = {
+  authUser, 
+  authCustomer, 
+  adminAuthorization 
+};

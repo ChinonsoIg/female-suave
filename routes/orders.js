@@ -2,12 +2,10 @@ const express = require('express');
 const router = express.Router();
 
 const {
-  auth,
-  authenticateCustomer
+  authUser,
+  authCustomer,
+  adminAuthorization,
 } = require('../middleware/authentication');
-
-// const authorizeAdmin = require('../middleware/authentication');
-// const authorizeSeller = require('../middleware/authentication');
 
 
 const {
@@ -18,9 +16,14 @@ const {
   updateOrder,
 } = require('../controllers/orders');
 
-router.route('/').post(authenticateCustomer, createOrder).get(auth, getAllOrders)
+router
+  .route('/')
+  .post(authCustomer, createOrder)
+  .get(authUser, adminAuthorization, getAllOrders)
 
-router.route('/showAllCustomerOrders').get(authenticateCustomer, getCurrentCustomerOrders)
+router
+  .route('/showAllCustomerOrders')
+  .get(authCustomer, getCurrentCustomerOrders)
 
 router.route('/:id').get(getSingleOrder).patch(updateOrder)
 
