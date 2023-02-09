@@ -62,7 +62,6 @@ const createOrder = async (req, res) => {
       console.log('qty updated')
     }
 
-
     // add item to order
     orderItems = [...orderItems, singleOrderItem];
 
@@ -80,8 +79,6 @@ const createOrder = async (req, res) => {
   //   quantity: total,
   //   currency: 'usd',
   // });
-
-  // console.log("d: ", {orderItems, VAT, subtotal, total, shippingFee})
 
 
   const order = await Order.create({
@@ -105,9 +102,6 @@ const createOrder = async (req, res) => {
 
 
 const getAllOrders = async (req, res) => {
-  // const orders = await Order.find({});
-  // res.status(StatusCodes.OK).json({ orders, count: orders.length });
-
   const {
     user: { userId, role },
     query: { page, limit, search }
@@ -180,13 +174,35 @@ const getAllOrders = async (req, res) => {
 
 
 const getSingleOrder = async (req, res) => {
-  const { id: orderId } = req.params;
-  const order = await Order.findOne({ _id: orderId });
-  if (!order) {
-    throw new NotFoundError(`No order with id : ${orderId}`);
+  const {
+    user: { userId, role },
+    params: { id: orderId }
+  } = req;
+
+  if (role === "admin") {
+    const order = await Order.findOne({ _id: orderId });
+    if (!order) {
+      throw new NotFoundError(`No order with id ${orderId}`)
+    }
+
+    res.status(StatusCodes.OK).json({ order })
+
+  } else {
+    const order = await Order
+      .findOne({ 
+        _id: orderId, 
+        'orderItems': { 
+          $elemMatch: { sellerId: userId }
+        } 
+      });
+
+    if (!order) {
+      throw new NotFoundError(`No order with id ${orderId}`)
+    }
+
+    res.status(StatusCodes.OK).json({ order })
   }
-  checkPermissions(req.user, order.user);
-  res.status(StatusCodes.OK).json({ order });
+
 };
 
 
