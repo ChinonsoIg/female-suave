@@ -20,6 +20,8 @@ const customersRouter = require('./routes/customerAuth');
 const usersRouter = require('./routes/users');
 const categoriesRouter = require('./routes/categories');
 const ordersRouter = require('./routes/orders');
+// const reviewsRouter = require('./routes/reviews');
+const errorHandler = require('./middleware/error-handler')
 
 // middleware
 app.set('trust proxy', 1)
@@ -42,7 +44,10 @@ app.use('/api/v1/products', authUser, productsRouter)
 app.use('/api/v1/users', authUser, usersRouter)
 app.use('/api/v1/categories', categoriesRouter)
 app.use('/api/v1/orders', ordersRouter)
+// app.use('/api/v1/reviews', reviewsRouter)
 
+
+app.use(errorHandler)
 
 const port = process.env.PORT || 5000;
 
