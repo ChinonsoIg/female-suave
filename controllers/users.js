@@ -28,7 +28,7 @@ const getUser = async (req, res) => {
   const {
     user: { userId, role: userRole },
     params: { id: userParam }
-  } = req
+  } = req;
 
   if (userRole === "admin") {
     const user = await User.findOne({ _id: userParam }).select('-password');

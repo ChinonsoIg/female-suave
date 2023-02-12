@@ -15,11 +15,12 @@ const connectDB = require('./db/connect');
 const { authUser, authCustomer } = require('./middleware/authentication')
 
 const authRouter = require('./routes/auth');
+const customerAuth = require('./routes/customerAuth');
 const productsRouter = require('./routes/products');
-const customersRouter = require('./routes/customerAuth');
 const usersRouter = require('./routes/users');
 const categoriesRouter = require('./routes/categories');
 const ordersRouter = require('./routes/orders');
+const customersRouter = require('./routes/customers');
 // const reviewsRouter = require('./routes/reviews');
 const errorHandler = require('./middleware/error-handler')
 
@@ -37,13 +38,15 @@ app.use(xss())
 app.get('/', (req, res) => {
   res.send('E-commerce  API')
 })
+
 // routes
 app.use('/api/v1/auth', authRouter)
-app.use('/api/v1/customer/auth', customersRouter)
+app.use('/api/v1/customer/auth', customerAuth)
 app.use('/api/v1/products', authUser, productsRouter)
 app.use('/api/v1/users', authUser, usersRouter)
 app.use('/api/v1/categories', categoriesRouter)
 app.use('/api/v1/orders', ordersRouter)
+app.use('/api/v1/customers', customersRouter)
 // app.use('/api/v1/reviews', reviewsRouter)
 
 

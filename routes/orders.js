@@ -19,7 +19,7 @@ const {
 router
   .route('/')
   .post(authCustomer, createOrder)
-  .get(authUser, adminAuthorization, getAllOrders)
+  .get(authUser, getAllOrders)
 
 router
   .route('/showAllCustomerOrders')
