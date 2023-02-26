@@ -12,7 +12,7 @@ const {
 } = require('../controllers/customers');
 
 
-router.route('/').get(authUser, adminAuthorization, getAllCustomers)
+router.route('/').get(authUser, getAllCustomers)
 router.route('/:id').get(getCustomer).patch(adminAuthorization, updateCustomer).delete(deleteCustomer)
 
 

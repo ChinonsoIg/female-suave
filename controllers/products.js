@@ -93,13 +93,20 @@ const getProduct = async (req, res) => {
 
 
 const createProduct = async (req, res) => {
+  const {
+    user: { userId },
+  } = req;
+
   // the code below links each product to the creator
-  req.body.createdBy = req.user.userId;
+  req.body.createdBy = userId;
 
   const product = await Product.create(req.body)
   res.status(StatusCodes.CREATED).json({ product })
 }
-
+// "Path `name` (`bee and bee body cream`) is longer than the maximum allowed length (20)."
+// status
+// : 
+// 400
 
 const updateProduct = async (req, res) => {
 
@@ -110,7 +117,7 @@ const updateProduct = async (req, res) => {
   } = req;
 
   if (name === '' || categoryId === '' || price === '', quantity === '' || description === '', status === '') {
-    throw new BadRequestError('product name, category, price, quantity, or description fields cannot be empty')
+    throw new BadRequestError('product name, categoryId, price, quantity, or description fields cannot be empty')
   }
 
   const product = await Product.findByIdAndUpdate({ 

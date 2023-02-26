@@ -4,7 +4,7 @@ const ProductSchema = new mongoose.Schema({
   name: {
     type: String,
     required: [true, 'Please provide product name'],
-    maxlength: 20
+    maxlength: 50
   },
   categoryId: {
     type: mongoose.Types.ObjectId,
@@ -24,7 +24,7 @@ const ProductSchema = new mongoose.Schema({
   description: {
     type: String,
     required: [true, 'Please provide product description'],
-    maxlength: 400
+    maxlength: 600
   },
   status: {
     type: String,

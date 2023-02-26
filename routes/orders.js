@@ -27,7 +27,7 @@ router
 
 router
   .route('/:id')
-  .get(authUser, adminAuthorization, getSingleOrder)
+  .get(authUser, getSingleOrder)
   .patch(updateOrder)
 
 
