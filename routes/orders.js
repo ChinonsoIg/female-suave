@@ -19,7 +19,7 @@ const {
 router
   .route('/')
   .post(authCustomer, createOrder)
-  .get(authUser, adminAuthorization, getAllOrders)
+  .get(authUser, getAllOrders)
 
 router
   .route('/showAllCustomerOrders')
@@ -27,7 +27,7 @@ router
 
 router
   .route('/:id')
-  .get(authUser, adminAuthorization, getSingleOrder)
+  .get(authUser, getSingleOrder)
   .patch(updateOrder)
 
 

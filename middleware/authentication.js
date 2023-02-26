@@ -1,6 +1,5 @@
 const jwt = require('jsonwebtoken')
-// const User = require('../models/User');
-const { UnauthenticatedError } = require('../errors');
+const { UnauthenticatedError, CustomAPIError } = require('../errors');
 const { StatusCodes } = require('http-status-codes');
 
 const authUser = async (req, res, next) => {
@@ -44,19 +43,36 @@ const authCustomer = async (req, res, next) => {
   }
 }
 
+// const sellerAuthorization = async (req, res, next) => {
+
+//   try {
+//     const { user: { role } } = req;
+//     if (role === 'admin') {
+//       next()
+//       // return;
+//     }
+
+//     throw new UnauthenticatedError('Unauthorized')
+
+//   } catch (error) {
+//     throw new UnauthenticatedError('Unauthorized')
+//   }
+
+// }
+
 const adminAuthorization = async (req, res, next) => {
 
   try {
     const { user: { role } } = req;
-    if (role === 'admin' || role === 'seller') {
+    if (role === 'admin') {
       next()
-      return;
+      // return;
     }
 
-    res.status(StatusCodes.UNAUTHORIZED).json({ status: 401, message: 'UNAUTHORIZED' })
+    throw new UnauthenticatedError('Unauthorized')
 
   } catch (error) {
-    res.status(StatusCodes.UNAUTHORIZED).json({ status: 401, message: 'UNAUTHORIZED' })
+    throw new UnauthenticatedError('Unauthorized')
   }
 
 }
@@ -64,6 +80,7 @@ const adminAuthorization = async (req, res, next) => {
 
 module.exports = {
   authUser, 
-  authCustomer, 
+  authCustomer,
+  // sellerAuthorization,
   adminAuthorization 
 };
