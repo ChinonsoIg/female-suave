@@ -42,7 +42,7 @@ app.get('/', (req, res) => {
 // routes
 app.use('/api/v1/auth', authRouter)
 app.use('/api/v1/customer/auth', customerAuth)
-app.use('/api/v1/products', authUser, productsRouter)
+app.use('/api/v1/products', productsRouter)
 app.use('/api/v1/users', authUser, usersRouter)
 app.use('/api/v1/categories', categoriesRouter)
 app.use('/api/v1/orders', ordersRouter)

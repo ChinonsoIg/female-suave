@@ -63,6 +63,40 @@ const getAllProducts = async (req, res) => {
   }
 }
 
+const getAllProductsStorefront = async (req, res) => {
+
+  const {
+    query: { page, limit, search }
+  } = req;
+
+  let parsePage = parseInt(page) || 0;
+  const pageCount = parsePage === 0 ? 0 : parsePage-1;
+  const limitNumber = parseInt(limit) || 10;
+  const searchQuery = search || '';
+  // let sort = sort || 'rating'; 
+  let searchString = searchQuery.split(" ").map(s => new RegExp(s));
+
+    const docCount = Product.countDocuments({
+      $or: [
+        { name: { $in: searchString } }, { description: { $in: searchString } }
+      ]
+    });
+    const products = Product
+      .find({
+        $or: [
+          { name: { $in: searchString } }, { description: { $in: searchString } }
+        ]
+      })
+      .sort('createdAt')
+      .skip(pageCount * limitNumber)
+      .limit(limitNumber)
+
+    const response = await Promise.all([products, docCount]);
+
+    res.status(StatusCodes.OK).json({ productsPerPage: response[0].length, totalProducts: response[1], products: response[0] })
+  
+}
+
 
 const getProduct = async (req, res) => {
 
@@ -89,6 +123,22 @@ const getProduct = async (req, res) => {
 
     res.status(StatusCodes.OK).json({ product })
   }
+}
+
+const getProductStoreFront = async (req, res) => {
+
+  const {
+    params: { id: productId }
+  } = req;
+
+    const product = await Product.findOne({ _id: productId });
+
+    if (!product) {
+      throw new NotFoundError(`No product with id ${productId}`)
+    }
+
+    res.status(StatusCodes.OK).json({ product })
+
 }
 
 
@@ -123,7 +173,7 @@ const updateProduct = async (req, res) => {
   const product = await Product.findByIdAndUpdate({ 
     _id: productId, createdBy: userId }, 
     { 
-      $inc: { quantity: req.body.quantity }, 
+      $inc: { quantity: req.body.quantity },
       name: req.body.name,
       categoryId: req.body.categoryId,
       price: req.body.price,
@@ -164,76 +214,115 @@ const deleteProduct = async (req, res) => {
 
 
 
-const getProductsByCategory = async (req, res) => {
+// const getProductsByCategory = async (req, res) => {
 
-  const {
-    user: { userId, role },
-    params: { categoryId },
-    query: { page, limit, search }
-  } = req;
+//   const {
+//     user: { userId, role },
+//     params: { categoryId },
+//     query: { page, limit, search }
+//   } = req;
 
-  let parsePage = parseInt(page) || 0;
-  const pageCount = parsePage === 0 ? 0 : parsePage-1;
-  const limitNumber = parseInt(limit) || 10;
-  const searchQuery = search || '';
-  // let sort = sort || 'rating';
-  let searchString = searchQuery.split(" ").map(s => new RegExp(s));
+//   let parsePage = parseInt(page) || 0;
+//   const pageCount = parsePage === 0 ? 0 : parsePage-1;
+//   const limitNumber = parseInt(limit) || 10;
+//   const searchQuery = search || '';
+//   // let sort = sort || 'rating';
+//   let searchString = searchQuery.split(" ").map(s => new RegExp(s));
 
-  if (role === 'admin') {
-    const docCount = Product.find.countDocuments({
-      categoryId,
-      $or: [
-        { name: { $in: searchString } }, { description: { $in: searchString } }
-      ]
-    });
-    const products = Product
-      .find({
-        categoryId,
-        $or: [
-          { name: { $in: searchString } }, { description: { $in: searchString } }
-        ]
-      })
-      .sort('createdAt')
-      .skip(pageCount * limitNumber)
-      .limit(limitNumber)
+//   if (role === 'admin') {
+//     const docCount = Product.find.countDocuments({
+//       categoryId,
+//       $or: [
+//         { name: { $in: searchString } }, { description: { $in: searchString } }
+//       ]
+//     });
+//     const products = Product
+//       .find({
+//         categoryId,
+//         $or: [
+//           { name: { $in: searchString } }, { description: { $in: searchString } }
+//         ]
+//       })
+//       .sort('createdAt')
+//       .skip(pageCount * limitNumber)
+//       .limit(limitNumber)
 
-    const response = await Promise.all([products, docCount]);
+//     const response = await Promise.all([products, docCount]);
 
-    res.status(StatusCodes.OK).json({ productsPerPage: response[0].length, totalProducts: response[1], products: response[0] })
-  } else {
+//     res.status(StatusCodes.OK).json({ productsPerPage: response[0].length, totalProducts: response[1], products: response[0] })
+//   } else {
 
-    const docCount = Product.countDocuments({
-      createdBy: userId,
-      categoryId,
-      $or: [
-        { name: { $in: searchString } }, { description: { $in: searchString } }
-      ]
-    });
-    const products = Product
-      .find({
-        createdBy: userId,
-        categoryId,
-        $or: [
-          { name: { $in: searchString } }, { description: { $in: searchString } }
-        ]
-      })
-      .sort('createdAt')
-      .skip(pageCount * limitNumber)
-      .limit(limitNumber)
+//     const docCount = Product.countDocuments({
+//       createdBy: userId,
+//       categoryId,
+//       $or: [
+//         { name: { $in: searchString } }, { description: { $in: searchString } }
+//       ]
+//     });
+//     const products = Product
+//       .find({
+//         createdBy: userId,
+//         categoryId,
+//         $or: [
+//           { name: { $in: searchString } }, { description: { $in: searchString } }
+//         ]
+//       })
+//       .sort('createdAt')
+//       .skip(pageCount * limitNumber)
+//       .limit(limitNumber)
 
-    const response = await Promise.all([products, docCount]);
+//     const response = await Promise.all([products, docCount]);
 
-    res.status(StatusCodes.OK).json({ productsPerPage: response[0].length, totalProducts: response[1], products: response[0] })
+//     res.status(StatusCodes.OK).json({ productsPerPage: response[0].length, totalProducts: response[1], products: response[0] })
 
-  }
-}
+//   }
+// }
+
+// const getProductsByCategoryStorefront = async (req, res) => {
+
+//   const {
+//     // user: { userId, role },
+//     params: { categoryId },
+//     query: { page, limit, search }
+//   } = req;
+
+//   let parsePage = parseInt(page) || 0;
+//   const pageCount = parsePage === 0 ? 0 : parsePage-1;
+//   const limitNumber = parseInt(limit) || 10;
+//   const searchQuery = search || '';
+//   // let sort = sort || 'rating';
+//   let searchString = searchQuery.split(" ").map(s => new RegExp(s));
+
+//     const docCount = Product.find.countDocuments({
+//       categoryId,
+//       $or: [
+//         { name: { $in: searchString } }, { description: { $in: searchString } }
+//       ]
+//     });
+//     const products = Product
+//       .find({
+//         categoryId,
+//         $or: [
+//           { name: { $in: searchString } }, { description: { $in: searchString } }
+//         ]
+//       })
+//       .sort('createdAt')
+//       .skip(pageCount * limitNumber)
+//       .limit(limitNumber)
+
+//     const response = await Promise.all([products, docCount]);
+
+//     res.status(StatusCodes.OK).json({ productsPerPage: response[0].length, totalProducts: response[1], products: response[0] })
+  
+// }
 
 
 module.exports = {
   getAllProducts,
+  getAllProductsStorefront,
   getProduct,
+  getProductStoreFront,
   createProduct,
   updateProduct,
   deleteProduct,
-  getProductsByCategory
 }

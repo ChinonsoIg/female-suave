@@ -62,7 +62,7 @@ const updateUser = async (req, res) => {
     params: { id: userParam },
   } = req;
 
-  if (firstName === '', lastName === '' || email === '' || address === '' || avatar === '') {
+  if (firstName === '', lastName === '' || email === '' || address === '') {
     throw new BadRequestError('firstName, lastName, email, address, or avatar fields cannot be empty')
   }
 

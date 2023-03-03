@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-// const authenticateUser = require('../middleware/authentication');
+const { authUser } = require('../middleware/authentication');
 
 const {
   getAllProducts,
@@ -9,12 +9,19 @@ const {
   createProduct,
   updateProduct,
   deleteProduct,
-  getProductsByCategory
+  getAllProductsStorefront,
+  getProductStoreFront,
 } = require('../controllers/products');
 
 
-router.route('/').post(createProduct).get(getAllProducts)
-router.route('/:id').get(getProduct).patch(updateProduct).delete(deleteProduct)
-router.route('/byCategory/:categoryId').get(getProductsByCategory)
+router.route('/').get(getAllProductsStorefront)
+// For admin and merchants
+router.route('/dashboard').post(authUser, createProduct).get(authUser, getAllProducts)
 
-module.exports = router
+
+router.route('/:id').get(getProductStoreFront)
+// For admin and merchants
+router.route('/dashboard/:id').get(authUser, getProduct).patch(authUser, updateProduct).delete(authUser, deleteProduct)
+
+
+module.exports = router;
