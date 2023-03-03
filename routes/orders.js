@@ -25,9 +25,9 @@ router
   .route('/showAllCustomerOrders')
   .get(authCustomer, getCurrentCustomerOrders)
 
-router
-  .route('/showAllCustomerOrders/:id')
-  .patch(updateOrder)
+// router
+//   .route('/showAllCustomerOrders/:id')
+//   .patch(authCustomer, updateOrder)
 
 router
   .route('/:id')
