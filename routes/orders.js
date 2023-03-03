@@ -26,9 +26,14 @@ router
   .get(authCustomer, getCurrentCustomerOrders)
 
 router
+  .route('/showAllCustomerOrders/:id')
+  .patch(updateOrder)
+
+router
   .route('/:id')
   .get(authUser, getSingleOrder)
-  .patch(updateOrder)
+  .get(authUser, getSingleOrder)
+  .patch(authUser, updateOrder)
 
 
 module.exports = router;

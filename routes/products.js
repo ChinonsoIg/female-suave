@@ -16,12 +16,12 @@ const {
 
 router.route('/').get(getAllProductsStorefront)
 // For admin and merchants
-router.route('/dashboard').post(authUser, createProduct).get(authUser, getAllProducts)
+router.route('/admin').post(authUser, createProduct).get(authUser, getAllProducts)
 
 
 router.route('/:id').get(getProductStoreFront)
 // For admin and merchants
-router.route('/dashboard/:id').get(authUser, getProduct).patch(authUser, updateProduct).delete(authUser, deleteProduct)
+router.route('/admin/:id').get(authUser, getProduct).patch(authUser, updateProduct).delete(authUser, deleteProduct)
 
 
 module.exports = router;
