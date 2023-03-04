@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const { authUser, adminAuthorization } = require('../middleware/authentication');
+const { authUser, authAdmin } = require('../middleware/authentication');
 // const authenticateUser = require('../middleware/authentication');
 
 const {
@@ -13,7 +13,7 @@ const {
 
 
 router.route('/').get(authUser, getAllCustomers)
-router.route('/:id').get(getCustomer).patch(adminAuthorization, updateCustomer).delete(deleteCustomer)
+router.route('/:id').get(getCustomer).patch(authAdmin, updateCustomer).delete(deleteCustomer)
 
 
 module.exports = router
