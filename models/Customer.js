@@ -24,10 +24,19 @@ const CustomerSchema = new mongoose.Schema({
     minLength: 10,
     maxLength: 250,
   },
+  phoneNumber: {
+    type: String,
+    required: [true, "Please provide a phone number"],
+  },
   password: {
     type: String,
     required: [true, "Please provide a password"],
     minLength: 6,
+  },
+  status: {
+    type: String,
+    enum: ['active', 'suspended'],
+    default: 'active'
   },
 });
 

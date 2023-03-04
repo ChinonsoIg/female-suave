@@ -3,7 +3,18 @@ const { StatusCodes } = require('http-status-codes');
 const { BadRequestError, NotFoundError } = require('../errors');
 // const bcrypt = require("bcryptjs");
 
-const getAllCustomers = async (req, res) => {
+const getAllCustomersAdmin = async (req, res) => {
+  const customers = await Customer
+    .find()
+    .sort('createdAt')
+    .select('-password');
+
+  res.status(StatusCodes.OK).json({ count: customers.length, customers })
+
+}
+
+const getAllCustomersMerchant = async (req, res) => {
+  // TODO: Deep filter out my customers
 
   const customers = await Customer
     .find()
@@ -14,60 +25,93 @@ const getAllCustomers = async (req, res) => {
 
 }
 
-const getAllMerchantCustomers = async (req, res) => {
-  // To be continued
-  
-  // const customers = await Customer
-  //   .find()
-  //   .sort('createdAt')
-  //   .select('-password');
 
-  // res.status(StatusCodes.OK).json({ count: customers.length, customers })
-
-}
-
-
-const getCustomer = async (req, res) => {
+const getCustomerAdmin = async (req, res) => {
 
   const {
-    user: { userId, role: userRole },
     params: { id: userParam }
   } = req
 
-  // if (userRole === "admin") {
-    const customer = await Customer.findOne({ _id: userParam }).select('-password');
+  const customer = await Customer.findOne({ _id: userParam }).select('-password');
 
-    if (!customer) {
-      throw new NotFoundError(`No user with id ${userId}`)
-    }
+  if (!customer) {
+    throw new NotFoundError(`No user with id ${userId}`)
+  }
 
-    res.status(StatusCodes.OK).json({ customer })
+  res.status(StatusCodes.OK).json({ customer })
 
-  // } else if (userId !== userParam) {
+}
 
-  //   res.status(StatusCodes.UNAUTHORIZED).json({ status: 401, message: "UNAUTHORIZED" })
-  // } else {
+const getCustomerMerchant = async (req, res) => {
 
-  //   const customer = await Customer.findOne({ _id: userId }).select('-password');
-  //   if (!customer) {
-  //     throw new NotFoundError(`No user with id ${userId}`)
-  //   }
+  const {
+    params: { id: userParam }
+  } = req
 
-  //   res.status(StatusCodes.OK).json({ customer })
-  // }
+  const customer = await Customer.findOne({ _id: userParam }).select('-password');
+
+  if (!customer) {
+    throw new NotFoundError(`No user with id ${userId}`)
+  }
+
+  res.status(StatusCodes.OK).json({ customer })
+
 }
 
 
-const updateCustomer = async (req, res) => {
+const getCustomerStorefront = async (req, res) => {
 
   const {
-    body: { status },
-    user: { userId, role: userRole },
+    customer: { customerId },
+    params: { id: userParam }
+  } = req
+
+  const customer = await Customer.findOne({ _id: userParam, _id: customerId }).select(['-password', '-__v']);
+
+  if (!customer) {
+    throw new NotFoundError(`No user with id ${ customerId }`)
+  }
+
+  res.status(StatusCodes.OK).json({ customer })
+
+}
+
+
+// const updateCustomerAdmin = async (req, res) => {
+
+//   const {
+//     body: { status },
+//     user: { userId },
+//     params: { id: userParam },
+//   } = req;
+
+//   if (status === '') {
+//     throw new BadRequestError('Status field cannot be empty')
+//   }
+
+//   const customer = await Customer.findByIdAndUpdate({ _id: userParam }, status, {
+//     new: true,
+//     runValidators: true
+//   }).select(['-name', '-email', '-address', '-phoneNumber', '-password']);
+
+//   if (!customer) {
+//     throw new NotFoundError(`No user with id ${userId}`)
+//   }
+
+//   res.status(StatusCodes.OK).json({ customer })
+
+// }
+
+const updateCustomerStorefront = async (req, res) => {
+
+  const {
+    body: { name, email, address, phoneNumber },
+    customer: { customerId },
     params: { id: userParam },
   } = req;
 
-  if (status === '') {
-    throw new BadRequestError('Status field cannot be empty')
+  if (name === '' || email === '' || address === '', phoneNumber === '') {
+    throw new BadRequestError('name, email, address or phone number fields cannot be empty')
   }
 
   // console.log("res: ", res)
@@ -77,30 +121,18 @@ const updateCustomer = async (req, res) => {
 
   // const modifiedBody = { ...req.body, password: hashPassword }
 
-  if (userRole === "admin") {
-    const customer = await Customer.findByIdAndUpdate({ _id: userParam }, status, {
-      new: true,
-      runValidators: true
-    }).select('-password');
-
-    if (!customer) {
-      throw new NotFoundError(`No user with id ${userId}`)
-    }
-
-    res.status(StatusCodes.OK).json({ customer })
-
-  } else if (userId !== userParam) {
+  if (customerId !== userParam) {
     res.status(StatusCodes.UNAUTHORIZED).json({ status: 401, message: "UNAUTHORIZED" })
 
   } else {
 
-    const customer = await Customer.findByIdAndUpdate({ _id: userId }, modifiableData, {
+    const customer = await Customer.findByIdAndUpdate({ _id: customerId }, req.body, {
       new: true,
       runValidators: true
     }).select('-password');
 
     if (!customer) {
-      throw new NotFoundError(`No user with id ${userId}`)
+      throw new NotFoundError(`No user with id ${ customerId }`)
     }
 
     res.status(StatusCodes.OK).json({ customer })
@@ -109,7 +141,7 @@ const updateCustomer = async (req, res) => {
 }
 
 
-const deleteCustomer = async (req, res) => {
+const deleteCustomerStorefront = async (req, res) => {
 
   const {
     user: { userId, role: userRole },
@@ -142,9 +174,11 @@ const deleteCustomer = async (req, res) => {
 
 
 module.exports = {
-  getAllCustomers,
-  getAllMerchantCustomers,
-  getCustomer,
-  updateCustomer,
-  deleteCustomer
+  getAllCustomersAdmin,
+  getAllCustomersMerchant,
+  getCustomerAdmin,
+  getCustomerMerchant,
+  getCustomerStorefront,
+  updateCustomerStorefront,
+  deleteCustomerStorefront
 }

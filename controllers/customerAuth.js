@@ -29,7 +29,17 @@ const login = async (req, res) => {
   const token = customer.createJWT();
   res
     .status(StatusCodes.OK)
-    .json({ customer: { name: customer.name }, token });
+    .json({ 
+      customer: { 
+        customerId: customer._id, 
+        name: customer.name, 
+        email: customer.email, 
+        address: customer.address, 
+        phoneNumber: customer.phoneNumber, 
+        status: customer.status 
+      }, 
+      token 
+    });
 };
 
 module.exports = {
