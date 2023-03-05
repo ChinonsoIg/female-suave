@@ -4,36 +4,51 @@ const router = express.Router();
 const {
   authUser,
   authCustomer,
-  adminAuthorization,
+  authAdmin,
 } = require('../middleware/authentication');
 
 
 const {
-  getAllOrders,
-  getSingleOrder,
+  getAllOrdersAdmin,
+  getAllOrdersMerchant,
+  getSingleOrderAdmin,
+  getSingleOrderMerchant,
   getCurrentCustomerOrders,
   createOrder,
-  updateOrder,
+  updateOrder
 } = require('../controllers/orders');
 
-router
-  .route('/')
-  .post(authCustomer, createOrder)
-  .get(authUser, getAllOrders)
 
+// For storefront
 router
-  .route('/showAllCustomerOrders')
+  .route('/storefront')
+  .post(authCustomer, createOrder)
   .get(authCustomer, getCurrentCustomerOrders)
 
-// router
-//   .route('/showAllCustomerOrders/:id')
-//   .patch(authCustomer, updateOrder)
+router
+  .route('/storefront/:id')
+  .patch(authCustomer, updateOrder)
+
+
+// For merchant
+router
+  .route('/merchant')
+  .get(authUser, getAllOrdersMerchant)
 
 router
-  .route('/:id')
-  .get(authUser, getSingleOrder)
-  .get(authUser, getSingleOrder)
-  .patch(authUser, updateOrder)
+  .route('/merchant/:id')
+  .get(authUser, getSingleOrderMerchant)
+
+
+// For admin 
+router
+  .route('/admin')
+  .get(authAdmin, getAllOrdersAdmin)
+
+router
+  .route('/admin/:id')
+  .get(authAdmin, getSingleOrderAdmin)
+  .patch(authAdmin, updateOrder)
 
 
 module.exports = router;

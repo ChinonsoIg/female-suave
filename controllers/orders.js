@@ -3,13 +3,6 @@ const Product = require('../models/Products');
 
 const { StatusCodes } = require('http-status-codes');
 const { BadRequestError, NotFoundError } = require('../errors');
-// const CustomError = require('../errors');
-// const { checkPermissions } = require('../utils');
-
-// const fakeStripeAPI = async ({ quantity, currency }) => {
-//   const client_secret = 'someRandomValue';
-//   return { client_secret, quantity };
-// };
 
 const createOrder = async (req, res) => {
   const {
@@ -100,79 +93,146 @@ const createOrder = async (req, res) => {
 };
 
 
-const getAllOrders = async (req, res) => {
+const getAllOrdersAdmin = async (req, res) => {
   const {
-    user: { userId, role },
     query: { page, limit, search }
   } = req;
 
   let parsePage = parseInt(page) || 0;
-  const pageCount = parsePage === 0 ? 0 : parsePage-1;
+  const pageCount = parsePage === 0 ? 0 : parsePage - 1;
   const limitNumber = parseInt(limit) || 10;
   const searchQuery = search || '';
   // let sort = sort || 'rating'; 
   let searchString = searchQuery.split(" ").map(s => new RegExp(s));
 
-  if (role === 'admin') {
-    const docCount = Order.countDocuments({
+  const docCount = Order.countDocuments({
+    $or: [
+      { name: { $in: searchString } },
+    ]
+  });
+  const orders = Order
+    .find({
       $or: [
         { name: { $in: searchString } },
       ]
-    });
-    const orders = Order
-      .find({
-        $or: [
-          { name: { $in: searchString } },
-        ]
-      })
-      .sort('createdAt')
-      .skip(pageCount * limitNumber)
-      .limit(limitNumber)
+    })
+    .sort('createdAt')
+    .skip(pageCount * limitNumber)
+    .limit(limitNumber)
 
-    const response = await Promise.all([orders, docCount]);
+  const response = await Promise.all([orders, docCount]);
 
-    res
-      .status(StatusCodes.OK)
-      .json({ 
-        ordersPerPage: response[0].length, 
-        totalOrders: response[1], 
-        orders: response[0] 
-      })
-  } else {
+  res
+    .status(StatusCodes.OK)
+    .json({
+      ordersPerPage: response[0].length,
+      totalOrders: response[1],
+      orders: response[0]
+    })
 
-    const docCount = Order.countDocuments({
-      'orderItems': { $elemMatch: { sellerId: userId }},
+};
+
+const getAllOrdersMerchant = async (req, res) => {
+  const {
+    user: { userId },
+    query: { page, limit, search }
+  } = req;
+
+  let parsePage = parseInt(page) || 0;
+  const pageCount = parsePage === 0 ? 0 : parsePage - 1;
+  const limitNumber = parseInt(limit) || 10;
+  const searchQuery = search || '';
+  // let sort = sort || 'rating'; 
+  let searchString = searchQuery.split(" ").map(s => new RegExp(s));
+  
+
+  // const orders = await Order.aggregate([
+  //   {
+  //     $replaceRoot: {
+  //       newRoot: // #7 ...and 
+  //       {
+  //         $first: // #6 like #2, turn the array of 1 into a single object.
+  //         {
+  //           $filter: {  // #4 ... and now we filter the 'visited' array...
+  //             input: {
+  //               $let: {
+  //                 vars: {
+  //                 //   qq: {
+  //                 //     $first: // #2  $filter will yield an array of 0 or 1;
+  //                 //     // use $first to turn into one object
+  //                 //     // #1 Find Name Person 3
+  //                     // {
+  //                       $filter: {
+  //                         input: 'orderItems',
+  //                         cond: { $eq: ['$this.price', '4500'] }
+  //                       }
+  //                     // }
+  //                 //   }
+  //                 },
+  //                 //  #3  We wish we could say $first.visited in #2 but we cannot
+  //                 //  so we use $let and the vars setup to allow us to get to
+  //                 //  the inner array 'visited':
+  //                 in: '$qq.orderItems'
+  //               }
+  //             },
+  //             cond: { $eq: ['$this.price', '4500'] } // #5 to match target id
+  //           }
+  //         }
+  //       }
+  //     }
+  //   }
+  // ]);
+
+
+  const docCount = await Order.countDocuments({
+    'orderItems': { $elemMatch: { sellerId: userId } },
+    $or: [
+      { name: { $in: searchString } },
+    ]
+  });
+
+  const orders = Order
+    .find({
+      'orderItems': { 
+        $elemMatch: { sellerId: userId },
+      },
       $or: [
         { name: { $in: searchString } },
       ]
-    });
+    })
+    .sort('createdAt')
+    .skip(pageCount * limitNumber)
+    .limit(limitNumber)
 
-    const orders = Order
-      .find({
-        'orderItems': { $elemMatch: { sellerId: userId }},
-        $or: [
-          { name: { $in: searchString } },
-        ]
-      })
-      .sort('createdAt')
-      .skip(pageCount * limitNumber)
-      .limit(limitNumber)
+  const response = await Promise.all([orders, docCount]);
 
-    const response = await Promise.all([orders, docCount]);
+  res
+    .status(StatusCodes.OK)
+    .json({
+      ordersPerPage: response[0].length,
+      totalOrders: response[1],
+      orders: response[0]
+    })
 
-    res
-      .status(StatusCodes.OK)
-      .json({ 
-        ordersPerPage: response[0].length, 
-        totalOrders: response[1], 
-        orders: response[0] 
-      })
-
-  }
 };
 
 
-const getSingleOrder = async (req, res) => {
+const getSingleOrderAdmin = async (req, res) => {
+  const {
+    params: { id: orderId }
+  } = req;
+
+  const order = await Order.findOne({ _id: orderId });
+  if (!order) {
+    throw new NotFoundError(`No order with id ${orderId}`)
+  }
+
+  res.status(StatusCodes.OK).json({ order })
+
+};
+
+
+const getSingleOrderMerchant = async (req, res) => {
   const {
     user: { userId, role },
     params: { id: orderId }
@@ -188,11 +248,11 @@ const getSingleOrder = async (req, res) => {
 
   } else {
     const order = await Order
-      .findOne({ 
-        _id: orderId, 
-        'orderItems': { 
+      .findOne({
+        _id: orderId,
+        'orderItems': {
           $elemMatch: { sellerId: userId }
-        } 
+        }
       });
 
     if (!order) {
@@ -213,7 +273,7 @@ const getCurrentCustomerOrders = async (req, res) => {
   // console.log("re: ", req.customer)
 
   let parsePage = parseInt(page) || 0;
-  const pageCount = parsePage === 0 ? 0 : parsePage-1;
+  const pageCount = parsePage === 0 ? 0 : parsePage - 1;
   const limitNumber = parseInt(limit) || 10;
   const searchQuery = search || '';
   // let sort = sort || 'rating'; 
@@ -237,14 +297,14 @@ const getCurrentCustomerOrders = async (req, res) => {
     .skip(pageCount * limitNumber)
     .limit(limitNumber)
 
-  const response = await Promise.all([ orders, docCount ]);
+  const response = await Promise.all([orders, docCount]);
 
   res
     .status(StatusCodes.OK)
-    .json({ 
-      ordersPerPage: response[0].length, 
-      totalOrders: response[1], 
-      orders: response[0] 
+    .json({
+      ordersPerPage: response[0].length,
+      totalOrders: response[1],
+      orders: response[0]
     })
 };
 
@@ -268,8 +328,10 @@ const updateOrder = async (req, res) => {
 
 
 module.exports = {
-  getAllOrders,
-  getSingleOrder,
+  getAllOrdersAdmin,
+  getAllOrdersMerchant,
+  getSingleOrderAdmin,
+  getSingleOrderMerchant,
   getCurrentCustomerOrders,
   createOrder,
   updateOrder,
