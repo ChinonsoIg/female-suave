@@ -1,18 +1,36 @@
 const express = require('express');
 const router = express.Router();
 
-const { authUser } = require('../middleware/authentication');
+const { authUser, authAdmin } = require('../middleware/authentication');
 
 const {
   getAllUsers,
-  getUser,
-  updateUser,
-  deleteUser
+  getUserAdmin,
+  getUserMerchant,
+  updateUserAdmin,
+  updateUserMerchant,
+  deleteUserAdmin,
+  deleteUserMerchant,
 } = require('../controllers/users');
 
+// For merchant
+router
+  .route('/merchant/:id')
+  .get(authUser, getUserMerchant)
+  .patch(authUser, updateUserMerchant)
+  .delete(authUser, deleteUserMerchant)
 
-router.route('/').get(authUser, getAllUsers)
-router.route('/:id').get(authUser, getUser).patch(authUser, updateUser).delete(authUser, deleteUser)
+
+// For admin
+router
+  .route('/admin')
+  .get(authAdmin, getAllUsers)
+
+router
+  .route('/admin/:id')
+  .get(authAdmin, getUserAdmin)
+  .patch(authAdmin, updateUserAdmin)
+  .delete(authAdmin, deleteUserAdmin)
 
 
 module.exports = router;

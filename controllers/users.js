@@ -4,65 +4,88 @@ const { BadRequestError, NotFoundError } = require('../errors');
 const bcrypt = require("bcryptjs");
 
 const getAllUsers = async (req, res) => {
-  const {
-    user: { role: userRole }
-  } = req;
 
-  if (userRole === 'admin') {
-    const users = await User
-      .find()
-      .sort('createdAt')
-      .select('-password');
+  const users = await User
+    .find()
+    .sort('createdAt')
+    .select('-password');
 
-    res.status(StatusCodes.OK).json({ count: users.length, users })
+  res.status(StatusCodes.OK).json({ count: users.length, users })
 
-  } else {
-
-    res.status(StatusCodes.UNAUTHORIZED).json({ status: 401, message: "UNAUTHORIZED" })
-  }
 }
 
 
-const getUser = async (req, res) => {
+const getUserAdmin = async (req, res) => {
 
   const {
-    user: { userId, role: userRole },
+    user: { userId },
     params: { id: userParam }
   } = req;
 
-  if (userRole === "admin") {
-    const user = await User.findOne({ _id: userParam }).select('-password');
+  const user = await User.findOne({ _id: userParam }).select('-password');
 
-    if (!user) {
-      throw new NotFoundError(`No user with id ${userId}`)
-    }
-
-    res.status(StatusCodes.OK).json({ user })
-
-  } else if (userId !== userParam) {
-
-    res.status(StatusCodes.UNAUTHORIZED).json({ status: 401, message: "UNAUTHORIZED" })
-  } else {
-
-    const user = await User.findOne({ _id: userId }).select('-password');
-    if (!user) {
-      throw new NotFoundError(`No user with id ${userId}`)
-    }
-
-    res.status(StatusCodes.OK).json({ user })
+  if (!user) {
+    throw new NotFoundError(`No user with id ${userId}`)
   }
+
+  res.status(StatusCodes.OK).json({ user })
+
 }
 
 
-const updateUser = async (req, res) => {
+const getUserMerchant = async (req, res) => {
 
   const {
-    body: { firstName, lastName, email, address, avatar },
-    user: { userId, role: userRole },
+    user: { userId },
+  } = req;
+
+  const user = await User.findOne({ _id: userId }).select(['-password', '-status', '-role']);
+
+  if (!user) {
+    throw new NotFoundError(`No user with id ${userId}`)
+  }
+
+  res.status(StatusCodes.OK).json({ user })
+
+}
+
+
+const updateUserAdmin = async (req, res) => {
+
+  const {
+    body: { status },
     params: { id: userParam },
   } = req;
 
-  if (firstName === '', lastName === '' || email === '' || address === '') {
+  if (status === '') {
+    throw new BadRequestError('status field cannot be empty')
+  }
+
+  const user = await User.findOneAndUpdate(
+    { _id: userParam },
+    { $set: { 'status': status } }
+  )
+
+  if (!user) {
+    throw new NotFoundError(`No user with id ${userId}`)
+  }
+
+  res
+    .status(StatusCodes.OK)
+    .json({ message: 'Update successful', status: 200 })
+
+}
+
+
+const updateUserMerchant = async (req, res) => {
+
+  const {
+    body: { firstName, lastName, email, address, phoneNumber, avatar },
+    user: { userId },
+    // params: { id: userParam },
+  } = req;
+
+  if (firstName === '', lastName === '' || email === '' || address === '', phoneNumber === '') {
     throw new BadRequestError('firstName, lastName, email, address, or avatar fields cannot be empty')
   }
 
@@ -71,82 +94,70 @@ const updateUser = async (req, res) => {
     lastName,
     email,
     address,
+    phoneNumber,
     avatar
   }
 
   // console.log("res: ", res)
-  // hash password
-  // const salt = await bcrypt.genSalt(10);
+  // hash password  
+  // const salt = await bcrypt.genSalt(10); 
   // const hashPassword = await bcrypt.hash(password, salt);
 
-  // const modifiedBody = { ...req.body, password: hashPassword }
+  const user = await User.findByIdAndUpdate({ _id: userId }, modifiableData, {
+    new: true,
+    runValidators: true
+  }).select(['-password', '-role', '-status']);
 
-  if (userRole === "admin") {
-    const user = await User.findByIdAndUpdate({ _id: userParam }, modifiableData, {
-      new: true,
-      runValidators: true
-    }).select('-password');
-
-    if (!user) {
-      throw new NotFoundError(`No user with id ${userId}`)
-    }
-
-    res.status(StatusCodes.OK).json({ user })
-
-  } else if (userId !== userParam) {
-    res.status(StatusCodes.UNAUTHORIZED).json({ status: 401, message: "UNAUTHORIZED" })
-
-  } else {
-
-    const user = await User.findByIdAndUpdate({ _id: userId }, modifiableData, {
-      new: true,
-      runValidators: true
-    }).select('-password');
-    if (!user) {
-      throw new NotFoundError(`No user with id ${userId}`)
-    }
-
-    res.status(StatusCodes.OK).json({ user })
+  if (!user) {
+    throw new NotFoundError(`No user with id ${userId}`)
   }
+
+  res.status(StatusCodes.OK).json({ user })
 
 }
 
 
-const deleteUser = async (req, res) => {
+const deleteUserAdmin = async (req, res) => {
 
   const {
-    user: { userId, role: userRole },
+    user: { userId },
     params: { id: userParam }
   } = req;
 
-  if (userRole === "admin") {
-    const user = await User.findByIdAndDelete({ _id: userParam }).select('-password');
+  const user = await User.findByIdAndDelete({ _id: userParam });
 
-    if (!user) {
-      throw new NotFoundError(`No user with id ${userId}`)
-    }
-
-    res.status(StatusCodes.OK).json({ user, message: "Success" })
-
-  } else if (userId !== userParam) {
-
-    res.status(StatusCodes.UNAUTHORIZED).json({ status: 401, message: "UNAUTHORIZED" })
-
-  } else {
-
-    const user = await User.findByIdAndDelete({ _id: userId }).select('-password');
-    if (!user) {
-      throw new NotFoundError(`No user with id ${userId}`)
-    }
-
-    res.status(StatusCodes.OK).json({ user, message: "Deleted succesfully" })
+  if (!user) {
+    throw new NotFoundError(`No user with id ${ userId }`)
   }
+
+  res.status(StatusCodes.OK).json({ user, message: "Deleted successfully" })
+
+}
+
+
+const deleteUserMerchant = async (req, res) => {
+
+  const {
+    user: { userId },
+    // params: { id: userParam }
+  } = req;
+
+  const user = await User.findByIdAndDelete({ _id: userId });
+  if (!user) {
+    throw new NotFoundError(`No user with id ${ userId }`)
+  }
+
+  res.status(StatusCodes.OK).json({ user, message: "Deleted succesfully" })
+
 }
 
 
 module.exports = {
   getAllUsers,
-  getUser,
-  updateUser,
-  deleteUser
+  getUserAdmin,
+  getUserMerchant,
+  updateUserAdmin,
+  updateUserMerchant,
+  deleteUserAdmin,
+  deleteUserMerchant
 }
