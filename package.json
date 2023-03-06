@@ -4,8 +4,8 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "nodemon app.js",
+    "test": "mocha --timeout 9000000"
   },
   "author": "",
   "license": "ISC",
@@ -26,6 +26,11 @@
     "xss-clean": "^0.1.1"
   },
   "devDependencies": {
-    "nodemon": "^2.0.15"
+    "chai": "^4.3.7",
+    "chai-http": "^4.3.0",
+    "mocha": "^10.2.0",
+    "nodemon": "^2.0.15",
+    "superagent": "^8.0.9",
+    "supertest": "^6.3.3"
   }
 }
