@@ -166,7 +166,7 @@ const getProductStoreFront = async (req, res) => {
 
 }
 
-
+// TODO: Give Admin ability to attach aa product to a merchant
 // const createProductAdmin = async (req, res) => {
 
 // // the admin should be able to attach a merchant to the product via option select
@@ -295,7 +295,7 @@ const deleteProductMerchant = async (req, res) => {
     throw new NotFoundError(`No product with id : ${productId}`)
   }
 
-  res.status(StatusCodes.OK).json({ product, messsage: "Deleted successfully" })
+  res.status(StatusCodes.OK).json({ product, message: "Deleted successfully" })
 }
 
 
