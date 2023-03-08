@@ -67,7 +67,7 @@ const updateUserAdmin = async (req, res) => {
   )
 
   if (!user) {
-    throw new NotFoundError(`No user with id ${userId}`)
+    throw new NotFoundError(`No user with id ${userParam}`)
   }
 
   res
@@ -117,22 +117,22 @@ const updateUserMerchant = async (req, res) => {
 }
 
 
-const deleteUserAdmin = async (req, res) => {
+// const deleteUserAdmin = async (req, res) => {
 
-  const {
-    user: { userId },
-    params: { id: userParam }
-  } = req;
+//   const {
+//     user: { userId },
+//     params: { id: userParam }
+//   } = req;
 
-  const user = await User.findByIdAndDelete({ _id: userParam });
+//   const user = await User.findByIdAndDelete({ _id: userParam });
 
-  if (!user) {
-    throw new NotFoundError(`No user with id ${ userId }`)
-  }
+//   if (!user) {
+//     throw new NotFoundError(`No user with id ${ userId }`)
+//   }
 
-  res.status(StatusCodes.OK).json({ user, message: "Deleted successfully" })
+//   res.status(StatusCodes.OK).json({ user, message: "Deleted successfully" })
 
-}
+// }
 
 
 const deleteUserMerchant = async (req, res) => {
@@ -147,7 +147,7 @@ const deleteUserMerchant = async (req, res) => {
     throw new NotFoundError(`No user with id ${ userId }`)
   }
 
-  res.status(StatusCodes.OK).json({ user, message: "Deleted succesfully" })
+  res.status(StatusCodes.OK).json({ user, message: "Deleted successfully" })
 
 }
 
@@ -158,6 +158,5 @@ module.exports = {
   getUserMerchant,
   updateUserAdmin,
   updateUserMerchant,
-  deleteUserAdmin,
   deleteUserMerchant
 }

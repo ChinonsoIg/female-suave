@@ -9,7 +9,6 @@ const {
   getUserMerchant,
   updateUserAdmin,
   updateUserMerchant,
-  deleteUserAdmin,
   deleteUserMerchant,
 } = require('../controllers/users');
 
@@ -30,7 +29,7 @@ router
   .route('/admin/:id')
   .get(authAdmin, getUserAdmin)
   .patch(authAdmin, updateUserAdmin)
-  .delete(authAdmin, deleteUserAdmin)
+  // .delete(authAdmin, deleteUserAdmin)
 
 
 module.exports = router;
