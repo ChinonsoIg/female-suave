@@ -44,6 +44,8 @@ const requestPasswordReset = async (email) => {
 
 const resetPassword = async (userId, token, password) => {
 
+  let user = await Token.findOne({ userId });
+
   let passwordResetToken = await Token.findOne({ userId });
   if (!passwordResetToken) {
     throw new Error("Invalid or expired password reset token");
@@ -59,6 +61,13 @@ const resetPassword = async (userId, token, password) => {
     { _id: userId },
     { $set: { password: hash } },
     { new: true }
+  );
+
+  sendEmail(
+    user.email,
+    'Password Reset Successful', 
+    {name: user.firstName}, 
+    './template/resetPassword.handlebars'
   );
   
 }
