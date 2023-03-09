@@ -2,6 +2,8 @@ const User = require("../models/User");
 const { StatusCodes } = require("http-status-codes");
 const { BadRequestError, UnauthenticatedError } = require("../errors");
 
+const { requestPasswordReset, resetPassword } = require('../services/recoverPassword')
+
 const register = async (req, res) => {
   const modifiedBody = { ...req.body, status: "pending", role: "seller" }
 
@@ -34,9 +36,32 @@ const login = async (req, res) => {
     .json({ user: { userId: user._id, firstName: user.firstName, lastName: user.lastName, role: user.role }, token });
 };
 
+
+
+
+// Reset password
+const requestPasswordResetController = async (req, res, next) => {
+
+  const requestPasswordResetService = await requestPasswordReset(
+    req.body.email
+  );
+  return res.json(requestPasswordResetService);
+};
+
+const resetPasswordController = async (req, res, next) => {
+  const resetPasswordService = await resetPassword(
+    req.body.userId,
+    req.body.token,
+    req.body.password
+  );
+  return res.json(resetPasswordService);
+};
+
 module.exports = {
   register,
   login,
+  requestPasswordResetController,
+  resetPasswordController
 };
 
 
